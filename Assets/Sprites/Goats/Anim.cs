@@ -2,14 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerAnim : MonoBehaviour {
+public class Anim : MonoBehaviour {
 
-    Animator anim;
-
-	// Use this for initialization
-	void Start () {
-        anim = GameObject.Find("Player").GetComponent<Animator>();
-	}
+    public Animator anim;
 	
 	// Update is called once per frame
 	void Update () {
