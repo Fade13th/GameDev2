@@ -20,11 +20,16 @@ public class Enemy : MonoBehaviour {
     private bool walking = false;
     private float time;
 
+    private float FOVXOffset, FOVYOffset, FOVZOffset;
+
     private float currentVelocity = 0;
 
     // Use this for initialization
     void Start () {
         rand = new System.Random();
+        FOVXOffset = 0.7f;
+        FOVYOffset = 0f;
+        FOVZOffset = 0f;
     }
 	
 	// Update is called once per frame
@@ -46,6 +51,9 @@ public class Enemy : MonoBehaviour {
         if (!walking && rand.Next(0, walkChance) == 1) {
             lastDirection = -lastDirection;
             moveVelocity += lastDirection * speed;
+            FovController fov = GetComponentInChildren<FovController>();
+            fov.transform.rotation = Quaternion.Euler(0, 0, 90 * lastDirection);
+            fov.transform.localPosition = new Vector3(lastDirection * FOVXOffset, FOVYOffset, FOVZOffset);
 
             if (lastDirection > 0) {
                 anim.SetInteger("Direction", 3);
