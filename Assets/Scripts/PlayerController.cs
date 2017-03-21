@@ -7,19 +7,30 @@ public class PlayerController : MonoBehaviour {
     public float speed;
     public float jump;
     float moveVelocity;
+    public bool JumpButtonPressed { get; set; }
 
     public Animator anim;
 
     //Grounded Vars
     bool isGrounded = true;
 
+    void Start() {
+        JumpButtonPressed = false;
+    }
+
     void Update() {
         //Jumping
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.W)) {
-            if (isGrounded) {
-                GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, jump);
-                isGrounded = false;
-            }
+            JumpButtonPressed = true;
+        }
+        else if (Input.GetKeyUp(KeyCode.Space) || Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.Z) || Input.GetKeyUp(KeyCode.W)) {
+            JumpButtonPressed = false;
+        }
+
+        if (JumpButtonPressed && isGrounded) {
+            GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, jump);
+            isGrounded = false;
+            JumpButtonPressed = false;
         }
 
         moveVelocity = 0;

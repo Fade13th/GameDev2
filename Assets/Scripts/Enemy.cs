@@ -20,20 +20,25 @@ public class Enemy : MonoBehaviour {
     private bool walking = false;
     private float time;
 
+    private float FOVXOffset, FOVYOffset, FOVZOffset;
+
     private float currentVelocity = 0;
 
     // Use this for initialization
-    void Start () {
+    void Start() {
         rand = new System.Random();
+        FOVXOffset = 0.7f;
+        FOVYOffset = 0f;
+        FOVZOffset = 0f;
     }
-	
-	// Update is called once per frame
-	void Update () {
+
+    // Update is called once per frame
+    void Update() {
         moveVelocity = 0;
 
         if (walking) {
             if (time > Time.time) {
-                moveVelocity = currentVelocity; 
+                moveVelocity = currentVelocity;
             }
             else {
                 currentVelocity = 0;
@@ -46,6 +51,9 @@ public class Enemy : MonoBehaviour {
         if (!walking && rand.Next(0, walkChance) == 1) {
             lastDirection = -lastDirection;
             moveVelocity += lastDirection * speed;
+            FoVController fov = GetComponentInChildren<FoVController>();
+            fov.transform.rotation = Quaternion.Euler(0, 0, 90 * lastDirection);
+            fov.transform.localPosition = new Vector3(lastDirection * FOVXOffset, FOVYOffset, FOVZOffset);
 
             if (lastDirection > 0) {
                 anim.SetInteger("Direction", 3);
@@ -56,7 +64,7 @@ public class Enemy : MonoBehaviour {
 
             currentVelocity = moveVelocity;
             walking = true;
-            time = Time.time + (float)( rand.NextDouble() * (walkTimeUpper - walkTimeLower) + walkTimeLower);
+            time = Time.time + (float)(rand.NextDouble() * (walkTimeUpper - walkTimeLower) + walkTimeLower);
         }
 
         GetComponent<Rigidbody2D>().velocity = new Vector2(moveVelocity, GetComponent<Rigidbody2D>().velocity.y);
