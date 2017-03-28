@@ -27,7 +27,7 @@ public class Enemy : MonoBehaviour {
     // Use this for initialization
     void Start() {
         rand = new System.Random();
-        FOVXOffset = 0.7f;
+        FOVXOffset = 0.5f;
         FOVYOffset = 0f;
         FOVZOffset = 0f;
     }
@@ -42,7 +42,7 @@ public class Enemy : MonoBehaviour {
             }
             else {
                 currentVelocity = 0;
-                walking = false;
+                walking = false;    
                 anim.SetInteger("Direction", 0);
             }
         }

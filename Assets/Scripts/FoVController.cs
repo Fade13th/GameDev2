@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using UnityEngine;
 
 public class FoVController : MonoBehaviour {
@@ -11,27 +12,46 @@ public class FoVController : MonoBehaviour {
     // Use this for initialization
     void Start() {
         _playerVisible = Color.red;
-        _playerVisible.a = 60f / 255f;
         _playerNotVisible = Color.green;
-        _playerNotVisible.a = 60f / 255f;
-        GetComponent<SpriteRenderer>().color = _playerNotVisible;
     }
 
     // Update is called once per frame
-    void Update() {
+    void Update()
+    {
+        SpriteRenderer sprite = GetComponent<SpriteRenderer>();
+        if (sprite != null)
+        {
+            if (PlayerSeen)
+            {
+                sprite.color = _playerVisible;
+            }
+            else
+            {
+                sprite.color = _playerNotVisible;
+            }
+        }
     }
 
-    void OnTriggerEnter2D(Collider2D collider) {
-        if (collider.tag == "Player") {
-            PlayerSeen = true;
-            GetComponent<SpriteRenderer>().color = _playerVisible;
+    void OnTriggerStay2D(Collider2D collider) {
+        if (collider.tag == "Player")
+        {
+            Vector3 origin = transform.parent.position;
+            Vector3 direction = collider.transform.position - origin;
+            RaycastHit2D raycast = Physics2D.Raycast(origin, direction);
+            if (raycast.collider == collider)
+            {
+                PlayerSeen = true;
+            }
+            else
+            {
+                PlayerSeen = false;
+            }
         }
     }
 
     void OnTriggerExit2D(Collider2D collider) {
         if (collider.tag == "Player") {
             PlayerSeen = false;
-            GetComponent<SpriteRenderer>().color = _playerNotVisible;
         }
     }
 

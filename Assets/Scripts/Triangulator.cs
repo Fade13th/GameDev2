@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class Triangulator {
-    private List<Vector2> m_points = new List<Vector2>();
+public class Triangulator
+{
+    private readonly List<Vector2> m_points;
 
     public Triangulator(Vector2[] points) {
         m_points = new List<Vector2>(points);
