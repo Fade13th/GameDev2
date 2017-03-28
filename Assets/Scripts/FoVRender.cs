@@ -48,6 +48,8 @@ public class FoVRender : MonoBehaviour {
         polygons.Clear();
 
         //Get polygons
+        //Only need one sight polygon, where the object is located"
+        /*
         for (float angle = angleStart; angle < angleFinish; angle += (Mathf.PI*2)/10) {
             float dx = Mathf.Cos(angle) * radius;
             float dy = Mathf.Sin(angle) * radius;
@@ -55,9 +57,16 @@ public class FoVRender : MonoBehaviour {
             polygons.Add(getSightPolygon(20 + dx, transform.position.y + dy));
             polygons.Add(getSightPolygon(820 + dx, 360 - transform.position.y + dy));
         }
+        */
+
+        polygons.Add(getSightPolygon(transform.parent.position.x, transform.parent.position.y));
 
         //Draw polygons
         foreach (Vector2[] polygon in polygons) {
+            foreach (Vector2 point in polygon)
+            {
+                Debug.DrawLine(transform.parent.position, point);
+            }
             Triangulator tr = new Triangulator(polygon);
             int[] indices = tr.Triangulate();
 
