@@ -28,8 +28,8 @@ public class Enemy : MonoBehaviour {
     void Start() {
         rand = new System.Random();
         FoVController fov = GetComponentInChildren<FoVController>();
-        FOVXOffset = fov.transform.localPosition.y/2;
-        FOVYOffset = fov.transform.localPosition.x/2;
+        FOVXOffset = fov.transform.localScale.y/2 - 0.02f;
+        FOVYOffset = 0f;
         FOVZOffset = 0f;
     }
 
@@ -54,7 +54,7 @@ public class Enemy : MonoBehaviour {
             moveVelocity += lastDirection * speed;
             FoVController fov = GetComponentInChildren<FoVController>();
             fov.transform.rotation = Quaternion.Euler(0, 0, 90 * lastDirection);
-            fov.transform.localPosition = new Vector3(lastDirection * FOVXOffset, FOVYOffset, FOVZOffset);
+            fov.Offset = new Vector3(lastDirection * FOVXOffset, FOVYOffset, FOVZOffset);
 
             if (lastDirection > 0) {
                 anim.SetInteger("Direction", 3);

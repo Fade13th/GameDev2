@@ -5,14 +5,6 @@ using System;
 using System.Linq;
 
 public class FoVRender : MonoBehaviour {
-    private class Line {
-        public Vector2 a, b;
-
-        public Line(Vector2 a, Vector2 b) {
-            this.a = a;
-            this.b = b;
-        }
-    }
 
     private class NoIntersectException : Exception {
         public NoIntersectException(string message) : base(message) { }
@@ -27,11 +19,13 @@ public class FoVRender : MonoBehaviour {
 
 
     private int WALL_LAYER = 9;
+    private FoVController foVController;
 
     List<Vector2> wallObjectCorners;
     List<Line> wallObjectSegments;
 
     MeshFilter filter;
+    private MeshRenderer renderer;
 
     // Use this for initialization
     void Start() {
@@ -43,6 +37,9 @@ public class FoVRender : MonoBehaviour {
         wallObjectSegments = getWallSegments(wallObjects);
 
         filter = GetComponent<MeshFilter>();
+        renderer = GetComponent<MeshRenderer>();
+        foVController = GetComponentInChildren<FoVController>();
+        renderer.sortingLayerName = "Lasers";
     }
 
     // Update is called once per frame
@@ -72,6 +69,7 @@ public class FoVRender : MonoBehaviour {
         int[] indices = tr.Triangulate();
 
         Vector3[] vertices = new Vector3[polygon.Length];
+        renderer.material.color = foVController.Color;
         for(int i = 0; i < vertices.Length; i++) {
             vertices[i] = new Vector3(polygon[i].x, polygon[i].y, 0);
         }
@@ -125,6 +123,17 @@ public class FoVRender : MonoBehaviour {
             }
         }
 
+        foreach (Vector2 point in foVController.Points)
+        {
+            float angle = Mathf.Atan2(point.y - sightY, point.x - sightX);
+            foreach (float angleOffset in angleOffsets)
+            {
+                angles.Add(angle + angleOffset);
+            }
+            
+        }
+
+
         Dictionary<float, Vector3> intersects = new Dictionary<float, Vector3>();
         //Rays in each angle
         foreach(float angle in angles) {
@@ -135,6 +144,20 @@ public class FoVRender : MonoBehaviour {
 
             Vector3 closestIntersect = new Vector3(0, 0, float.MaxValue);
             foreach(Line line in wallObjectSegments) {
+                try {
+                    Vector3 intersect = getIntersection(ray, line);
+
+                    if(intersect.z < closestIntersect.z) {
+                        closestIntersect = intersect;
+                    }
+                }
+                catch(NoIntersectException e) {
+                    //Dirty using an exception for this, but it won't let you return null
+                    continue;
+                }
+            }
+
+            foreach(Line line in foVController.Edges) {
                 try {
                     Vector3 intersect = getIntersection(ray, line);
 
@@ -225,7 +248,6 @@ public class FoVRender : MonoBehaviour {
 
     private List<Line> getWallSegments(List<GameObject> objects) {
         List<Line> lines = new List<Line>();
-
         foreach(GameObject obj in objects) {
             BoxCollider2D box = obj.GetComponent<BoxCollider2D>();
             PolygonCollider2D poly = obj.GetComponent<PolygonCollider2D>();
