@@ -27,8 +27,9 @@ public class Enemy : MonoBehaviour {
     // Use this for initialization
     void Start() {
         rand = new System.Random();
-        FOVXOffset = 0.5f;
-        FOVYOffset = 0f;
+        FoVController fov = GetComponentInChildren<FoVController>();
+        FOVXOffset = fov.transform.localPosition.y/2;
+        FOVYOffset = fov.transform.localPosition.x/2;
         FOVZOffset = 0f;
     }
 
