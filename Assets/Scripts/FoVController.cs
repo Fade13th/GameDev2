@@ -41,9 +41,9 @@ public class FoVController : MonoBehaviour {
     void Start() {
         Offset = transform.localPosition;
         _playerVisible = Color.red;
-        _playerVisible.a = 60 / 255f;
-        _playerNotVisible = Color.green;
-        _playerNotVisible.a = 60 / 255f;
+        _playerVisible.a = 128 / 255f;
+        _playerNotVisible = Color.red;
+        _playerNotVisible.a = 40 / 255f;
     }
 
     // Update is called once per frame
@@ -63,6 +63,7 @@ public class FoVController : MonoBehaviour {
             else {
                 PlayerSeen = false;
             }
+            print(raycast.collider.tag);
         }
     }
 

@@ -24,6 +24,8 @@ public class Enemy : MonoBehaviour {
 
     private float currentVelocity = 0;
 
+    private bool started = false;
+
     // Use this for initialization
     void Start() {
         rand = new System.Random();
@@ -49,7 +51,7 @@ public class Enemy : MonoBehaviour {
         }
 
         //Moves back and forth a set amount at random intervals
-        if (!walking && rand.Next(0, walkChance) == 1) {
+        if (!walking && (rand.Next(0, walkChance) == 1 || !started)) {
             lastDirection = -lastDirection;
             moveVelocity += lastDirection * speed;
             FoVController fov = GetComponentInChildren<FoVController>();
@@ -66,6 +68,8 @@ public class Enemy : MonoBehaviour {
             currentVelocity = moveVelocity;
             walking = true;
             time = Time.time + (float)(rand.NextDouble() * (walkTimeUpper - walkTimeLower) + walkTimeLower);
+
+            started = true;
         }
 
         GetComponent<Rigidbody2D>().velocity = new Vector2(moveVelocity, GetComponent<Rigidbody2D>().velocity.y);

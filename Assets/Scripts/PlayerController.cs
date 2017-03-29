@@ -12,7 +12,7 @@ public class PlayerController : MonoBehaviour {
     public Animator anim;
 
     //Grounded Vars
-    bool isGrounded = true;
+    internal bool isGrounded = true;
 
     void Start() {
         JumpButtonPressed = false;
