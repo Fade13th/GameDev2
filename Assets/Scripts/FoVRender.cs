@@ -62,9 +62,6 @@ public class FoVRender : MonoBehaviour {
         Vector2[] polygon = getSightPolygon(transform.parent.position.x, transform.parent.position.y);
 
         //Draw polygons
-        foreach(Vector2 point in polygon) {
-            Debug.DrawLine(transform.parent.position, point);
-        }
         Triangulator tr = new Triangulator(polygon);
         int[] indices = tr.Triangulate();
 
@@ -193,15 +190,24 @@ public class FoVRender : MonoBehaviour {
                 }
             }
             else if(box) {
-                Vector2 center = box.bounds.center;
+                float width = box.size.x/2;
+                float height = box.size.y/2;
 
-                float width = box.size[0];
-                float height = box.size[1];
+                GameObject boxObject = box.gameObject;
+                var thisMatrix = boxObject.transform.localToWorldMatrix;
 
-                corners.Add(new Vector2(center.x + width / 2, center.y + height / 2));
-                corners.Add(new Vector2(center.x + width / 2, center.y - height / 2));
-                corners.Add(new Vector2(center.x - width / 2, center.y + height / 2));
-                corners.Add(new Vector2(center.x - width / 2, center.y - height / 2));
+                Vector2[] points = new Vector2[4];
+                //width + height are from centre point.
+                points[0] = thisMatrix.MultiplyPoint3x4(new Vector2(width, height));
+                points[1] = thisMatrix.MultiplyPoint3x4(new Vector2(width, -height));
+                points[2] = thisMatrix.MultiplyPoint3x4(new Vector2(-width, -height));
+                points[3] = thisMatrix.MultiplyPoint3x4(new Vector2(-width, height));
+
+
+                foreach (Vector2 point in points)
+                {
+                    corners.Add(point);
+                }
             }
         }
 
@@ -228,20 +234,23 @@ public class FoVRender : MonoBehaviour {
                 }
             }
             else if(box) {
-                Vector2 center = box.bounds.center;
+                float width = box.size.x/2;
+                float height = box.size.y/2;
 
-                float width = box.size[0];
-                float height = box.size[1];
+                GameObject boxObject = box.gameObject;
+                var thisMatrix = boxObject.transform.localToWorldMatrix;
 
-                Vector2 a = new Vector2(center.x + width / 2, center.y + height / 2);
-                Vector2 b = new Vector2(center.x + width / 2, center.y - height / 2);
-                Vector2 c = new Vector2(center.x - width / 2, center.y + height / 2);
-                Vector2 d = new Vector2(center.x - width / 2, center.y - height / 2);
+                Vector2[] points = new Vector2[4];
+                //width + height are from centre point.
+                points[0] = thisMatrix.MultiplyPoint3x4(new Vector2(width, height));
+                points[1] = thisMatrix.MultiplyPoint3x4(new Vector2(width, -height));
+                points[2] = thisMatrix.MultiplyPoint3x4(new Vector2(-width, -height));
+                points[3] = thisMatrix.MultiplyPoint3x4(new Vector2(-width, height));
 
-                lines.Add(new Line(a, b));
-                lines.Add(new Line(b, c));
-                lines.Add(new Line(c, d));
-                lines.Add(new Line(d, a));
+                lines.Add(new Line(points[0], points[1]));
+                lines.Add(new Line(points[1], points[2]));
+                lines.Add(new Line(points[2], points[3]));
+                lines.Add(new Line(points[3], points[0]));
             }
         }
 
