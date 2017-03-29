@@ -19,10 +19,12 @@ public class FoVRender : MonoBehaviour {
     }
 
     private List<Vector2[]> polygons;
+    private List<float> angleOffsets = new List<float>(new float[]{-0.001f, 0f, 0.001f});
 
     public float angleStart = 0;
     public float angleFinish = Mathf.PI * 0.5f;
     public float radius = 10;
+
 
     private int WALL_LAYER = 9;
 
@@ -61,6 +63,10 @@ public class FoVRender : MonoBehaviour {
 
         Vector2[] polygon = getSightPolygon(transform.parent.position.x, transform.parent.position.y);
 
+        foreach (Vector2 point in polygon)
+        {
+            Debug.DrawLine(transform.parent.position, point);
+        }
         //Draw polygons
         Triangulator tr = new Triangulator(polygon);
         int[] indices = tr.Triangulate();
@@ -113,7 +119,10 @@ public class FoVRender : MonoBehaviour {
         List<float> angles = new List<float>();
         foreach(Vector2 point in wallObjectCorners) {
             float angle = Mathf.Atan2(point.y - sightY, point.x - sightX);
-            angles.Add(angle);
+            foreach (float angleOffset in angleOffsets)
+            {
+                angles.Add(angle + angleOffset);
+            }
         }
 
         Dictionary<float, Vector3> intersects = new Dictionary<float, Vector3>();
