@@ -63,7 +63,6 @@ public class FoVController : MonoBehaviour {
             else {
                 PlayerSeen = false;
             }
-            print(raycast.collider.tag);
         }
     }
 

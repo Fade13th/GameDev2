@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using Random = UnityEngine.Random;
 
 public class FoVRender : MonoBehaviour {
 
@@ -10,6 +11,7 @@ public class FoVRender : MonoBehaviour {
         public NoIntersectException(string message) : base(message) { }
     }
 
+    public bool NeedToUpdate { get; private set; }
     private List<Vector2[]> polygons;
     private List<float> angleOffsets = new List<float>(new float[]{-0.001f, 0f, 0.001f});
 
@@ -40,43 +42,53 @@ public class FoVRender : MonoBehaviour {
         renderer = GetComponent<MeshRenderer>();
         foVController = GetComponentInChildren<FoVController>();
         renderer.sortingLayerName = "Lasers";
+        NeedToUpdate = true;
+        LastUpdated = Random.Range(-0.1f, 0f);
     }
 
     // Update is called once per frame
     void Update() {
+        if (transform.localPosition != -transform.parent.position)
+        {
+            transform.localPosition = -transform.parent.position;
+            NeedToUpdate = true;
+        }
+
+        if (renderer.isVisible && NeedToUpdate && Time.time > LastUpdated + 0.1) 
+        {
+            CalculateMesh();
+            NeedToUpdate = false;
+            LastUpdated = Time.time;
+        }
+    }
+
+    public float LastUpdated { get; set; }
+
+
+    private void CalculateMesh()
+    {
         polygons.Clear();
 
-        //Get polygons
-        //Only need one sight polygon, where the object is located"
-        /*
-        for (float angle = angleStart; angle < angleFinish; angle += (Mathf.PI*2)/10) {
-            float dx = Mathf.Cos(angle) * radius;
-            float dy = Mathf.Sin(angle) * radius;
-
-            polygons.Add(getSightPolygon(20 + dx, transform.position.y + dy));
-            polygons.Add(getSightPolygon(820 + dx, 360 - transform.position.y + dy));
-        }
-        */
 
         Vector2[] polygon = getSightPolygon(transform.parent.position.x, transform.parent.position.y);
 
-        foreach (Vector2 point in polygon)
-        {
-            Debug.DrawLine(transform.parent.position, point);
-        }
+//        foreach(Vector2 point in polygon)
+//        {
+//            Debug.DrawLine(transform.parent.position, point);
+//        }
         //Draw polygons
         Triangulator tr = new Triangulator(polygon);
         int[] indices = tr.Triangulate();
 
         Vector3[] vertices = new Vector3[polygon.Length];
         renderer.material.color = foVController.Color;
-        for(int i = 0; i < vertices.Length; i++) {
+        for (int i = 0; i < vertices.Length; i++)
+        {
             vertices[i] = new Vector3(polygon[i].x, polygon[i].y, 0);
         }
 
 
-         Mesh mesh = new Mesh();
-        transform.localPosition = -transform.parent.position;
+        Mesh mesh = new Mesh();
         mesh.vertices = vertices;
         mesh.triangles = indices;
         mesh.RecalculateNormals();
@@ -84,6 +96,7 @@ public class FoVRender : MonoBehaviour {
 
         filter.mesh = mesh;
     }
+
 
     private Vector3 getIntersection(Line a, Line b) {
         float a_px = a.a.x;
@@ -112,6 +125,7 @@ public class FoVRender : MonoBehaviour {
 
         return new Vector3(a_px + a_dx * t1, a_py + a_dy * t1, t1);
     }
+
 
     private Vector2[] getSightPolygon(float sightX, float sightY) {
         List<float> angles = new List<float>();
@@ -143,18 +157,26 @@ public class FoVRender : MonoBehaviour {
             Line ray = new Line(new Vector2(sightX, sightY), new Vector2(sightX + dx, sightY + dy));
 
             Vector3 closestIntersect = new Vector3(0, 0, float.MaxValue);
-            foreach(Line line in wallObjectSegments) {
-                try {
-                    Vector3 intersect = getIntersection(ray, line);
+//            foreach(Line line in wallObjectSegments) {
+//                try {
+//                    Vector3 intersect = getIntersection(ray, line);
+//
+//                    if(intersect.z < closestIntersect.z) {
+//                        closestIntersect = intersect;
+//                    }
+//                }
+//                catch(NoIntersectException e) {
+//                    //Dirty using an exception for this, but it won't let you return null
+//                    continue;
+//                }
+//            }
 
-                    if(intersect.z < closestIntersect.z) {
-                        closestIntersect = intersect;
-                    }
-                }
-                catch(NoIntersectException e) {
-                    //Dirty using an exception for this, but it won't let you return null
-                    continue;
-                }
+            RaycastHit2D raycast = Physics2D.Raycast(ray.a, new Vector2(dx, dy));
+            if (raycast.collider != null && raycast.distance < closestIntersect.z)
+            {
+                closestIntersect = raycast.point;
+                closestIntersect.z = raycast.distance;
+                Debug.DrawLine(ray.a, raycast.point, Color.cyan, 1);
             }
 
             foreach(Line line in foVController.Edges) {
