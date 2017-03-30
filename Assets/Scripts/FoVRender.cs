@@ -13,7 +13,7 @@ public class FoVRender : MonoBehaviour {
 
     public bool NeedToUpdate { get; private set; }
     private List<Vector2[]> polygons;
-    private List<float> angleOffsets = new List<float>(new float[]{-0.001f, 0f, 0.001f});
+    private List<float> angleOffsets = new List<float>(new float[] { -0.001f, 0f, 0.001f });
 
     public float angleStart = 0;
     public float angleFinish = Mathf.PI * 0.5f;
@@ -50,14 +50,12 @@ public class FoVRender : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         renderer.material.color = foVController.Color;
-        if (transform.localPosition != -transform.parent.position)
-        {
+        if(transform.localPosition != -transform.parent.position) {
             transform.localPosition = -transform.parent.position;
             NeedToUpdate = true;
         }
 
-        if (renderer.isVisible && (NeedToUpdate && Time.time > NextUpdate)) 
-        {
+        if(renderer.isVisible && (NeedToUpdate && Time.time > NextUpdate)) {
             CalculateMesh();
             NeedToUpdate = false;
             NextUpdate = Time.time + 0.2f;
@@ -67,24 +65,22 @@ public class FoVRender : MonoBehaviour {
     public float NextUpdate { get; set; }
 
 
-    private void CalculateMesh()
-    {
+    private void CalculateMesh() {
         polygons.Clear();
 
 
         Vector2[] polygon = getSightPolygon(transform.parent.position.x, transform.parent.position.y);
 
-//        foreach(Vector2 point in polygon)
-//        {
-//            Debug.DrawLine(transform.parent.position, point);
-//        }
+        //        foreach(Vector2 point in polygon)
+        //        {
+        //            Debug.DrawLine(transform.parent.position, point);
+        //        }
         //Draw polygons
         Triangulator tr = new Triangulator(polygon);
         int[] indices = tr.Triangulate();
 
         Vector3[] vertices = new Vector3[polygon.Length];
-        for (int i = 0; i < vertices.Length; i++)
-        {
+        for(int i = 0; i < vertices.Length; i++) {
             vertices[i] = new Vector3(polygon[i].x, polygon[i].y, 0);
         }
 
@@ -129,56 +125,34 @@ public class FoVRender : MonoBehaviour {
 
 
     private Vector2[] getSightPolygon(float sightX, float sightY) {
-        List<float> angles = new List<float>();
+        Vector2 pos = new Vector2(sightX, sightY);
+        float colliderSqMag = foVController.Size.sqrMagnitude * 1.1f;
+        float colliderMag = foVController.Size.magnitude * 1.1f;
+
+        List<Vector2> vertices = new List<Vector2>();
+        List<Vector3> secondPassVertices = new List<Vector3>();
+
+        //Cull points to test
         foreach(Vector2 point in wallObjectCorners) {
-            float angle = Mathf.Atan2(point.y - sightY, point.x - sightX);
-            foreach (float angleOffset in angleOffsets)
-            {
-                angles.Add(angle + angleOffset);
+            float distance = (point - pos).sqrMagnitude;
+            if(distance < colliderSqMag) {
+                vertices.Add(point);
             }
         }
 
-        foreach (Vector2 point in foVController.Points)
-        {
-            float angle = Mathf.Atan2(point.y - sightY, point.x - sightX);
-            foreach (float angleOffset in angleOffsets)
-            {
-                angles.Add(angle + angleOffset);
-            }
-            
+        foreach(Vector2 point in foVController.Points) {
+            vertices.Add(point);
         }
 
 
         Dictionary<float, Vector3> intersects = new Dictionary<float, Vector3>();
-        //Rays in each angle
-        foreach(float angle in angles) {
-            float dx = Mathf.Cos(angle);
-            float dy = Mathf.Sin(angle);
+        //raycast each Point
+        foreach(Vector2 vertex in vertices) {
+            float angle = Mathf.Atan2(vertex.y - sightY, vertex.x - sightX);
 
-            Line ray = new Line(new Vector2(sightX, sightY), new Vector2(sightX + dx, sightY + dy));
+            Line ray = new Line(pos, vertex);
 
             Vector3 closestIntersect = new Vector3(0, 0, float.MaxValue);
-//            foreach(Line line in wallObjectSegments) {
-//                try {
-//                    Vector3 intersect = getIntersection(ray, line);
-//
-//                    if(intersect.z < closestIntersect.z) {
-//                        closestIntersect = intersect;
-//                    }
-//                }
-//                catch(NoIntersectException e) {
-//                    //Dirty using an exception for this, but it won't let you return null
-//                    continue;
-//                }
-//            }
-
-            RaycastHit2D raycast = Physics2D.Raycast(ray.a, new Vector2(dx, dy), float.MaxValue, 1 << WALL_LAYER);
-            if (raycast.collider != null && raycast.distance < closestIntersect.z)
-            {
-                closestIntersect = raycast.point;
-                closestIntersect.z = raycast.distance;
-                Debug.DrawLine(ray.a, raycast.point, Color.cyan, 1);
-            }
 
             foreach(Line line in foVController.Edges) {
                 try {
@@ -194,10 +168,52 @@ public class FoVRender : MonoBehaviour {
                 }
             }
 
+            RaycastHit2D raycast = Physics2D.Raycast(pos, vertex - pos, float.MaxValue, 1 << WALL_LAYER);
+            if(raycast.collider != null && raycast.distance < closestIntersect.z) {
+                closestIntersect = raycast.point;
+                closestIntersect.z = raycast.distance;
+                Vector2 normal = raycast.normal;
+                Vector2 surfacePos = new Vector2(normal.y, -normal.x) * colliderMag;
+                Vector2 surfaceNeg = new Vector2(-normal.y, normal.x) * colliderMag;
+
+                foreach(Line line in foVController.Edges) {
+                    try {
+                        //secondPassVertices.Add(getIntersection(new Line(raycast.point, surfacePos), line));
+                    }
+                    catch(NoIntersectException e) {
+                    }
+                    try {
+                        //secondPassVertices.Add(getIntersection(new Line(raycast.point, surfaceNeg), line));
+                    }
+                    catch(NoIntersectException e) {
+                        continue;
+                    }
+                }
+            }
+
             if(closestIntersect.z == float.MaxValue) continue;
 
             intersects.Add(angle, closestIntersect);
         }
+
+        foreach (Vector3 vertex in secondPassVertices)
+        {
+
+            float angle = Mathf.Atan2(vertex.y - sightY, vertex.x - sightX);
+            Vector3 closestIntersect = vertex;
+            RaycastHit2D raycast = Physics2D.Raycast(pos, (Vector2) vertex - pos, float.MaxValue, 1 << WALL_LAYER);
+            if(raycast.collider != null && raycast.distance < closestIntersect.z) {
+                closestIntersect = raycast.point;
+                closestIntersect.z = raycast.distance;
+            }
+
+            if(closestIntersect.z == float.MaxValue) continue;
+
+            Debug.DrawLine(pos, closestIntersect, Color.green, 1);
+            intersects.Add(angle, closestIntersect);
+        }
+
+
 
         //Sort by angle
         int i = 0;
@@ -245,8 +261,8 @@ public class FoVRender : MonoBehaviour {
                 }
             }
             else if(box) {
-                float width = box.size.x/2;
-                float height = box.size.y/2;
+                float width = box.size.x / 2;
+                float height = box.size.y / 2;
 
                 GameObject boxObject = box.gameObject;
                 var thisMatrix = boxObject.transform.localToWorldMatrix;
@@ -259,8 +275,7 @@ public class FoVRender : MonoBehaviour {
                 points[3] = thisMatrix.MultiplyPoint3x4(new Vector2(-width, height));
 
 
-                foreach (Vector2 point in points)
-                {
+                foreach(Vector2 point in points) {
                     corners.Add(point);
                 }
             }
@@ -288,8 +303,8 @@ public class FoVRender : MonoBehaviour {
                 }
             }
             else if(box) {
-                float width = box.size.x/2;
-                float height = box.size.y/2;
+                float width = box.size.x / 2;
+                float height = box.size.y / 2;
 
                 GameObject boxObject = box.gameObject;
                 var thisMatrix = boxObject.transform.localToWorldMatrix;
