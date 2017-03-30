@@ -82,7 +82,7 @@ public class FoVController : MonoBehaviour {
     void OnTriggerStay2D(Collider2D collider) {
         if(collider.tag == "Player")
         {
-            Vector3 origin = transform.parent.parent.position;
+            Vector3 origin = transform.parent.position;
             Vector3 direction = collider.transform.position - origin;
             RaycastHit2D raycast = Physics2D.Raycast(origin, direction);
             if(raycast.collider.CompareTag("Player")) { 
