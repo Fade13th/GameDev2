@@ -11,15 +11,22 @@ public class ThroughPlatform : MonoBehaviour {
         coll = GetComponent<BoxCollider2D>();
     }
 
-
     void OnTriggerEnter2D(Collider2D collider) {
         if (collider.name == "TopCollider") {
             coll.isTrigger = true;
         }
 
-        if (collider.name == "BottomCollider") {
+        if (collider.name == "BottomCollider" && !player.falling) {
             player.isGrounded = true;
             coll.isTrigger = false;
         }
     }
-}
+
+    void OnTriggerStay2D(Collider2D collider) {
+        if (player.falling) {
+            player.isGrounded = false;
+            coll.isTrigger = true;
+        }
+    }
+
+    }

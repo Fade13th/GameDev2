@@ -11,6 +11,8 @@ public class PlayerController : MonoBehaviour {
 
     public Animator anim;
 
+    internal bool falling = false;
+
     //Grounded Vars
     internal bool isGrounded = true;
 
@@ -33,6 +35,13 @@ public class PlayerController : MonoBehaviour {
             JumpButtonPressed = false;
         }
 
+        if (Input.GetKeyDown(KeyCode.S)) {
+            falling = true;
+        }
+        else if (Input.GetKeyUp(KeyCode.S)) {
+            falling = false;
+        }
+
         moveVelocity = 0;
 
         //Left Right Movement
@@ -52,7 +61,9 @@ public class PlayerController : MonoBehaviour {
     }
     //Check if Grounded
     void OnTriggerEnter2D(Collider2D collider) {
-        if (collider.tag == "Floor")
+        if (collider.tag == "Floor" && collider.transform.position.y < transform.position.y) {
+            falling = false;
             isGrounded = true;
+        }
     }
 }
