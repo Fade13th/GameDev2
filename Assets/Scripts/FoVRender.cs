@@ -42,19 +42,21 @@ public class FoVRender : MonoBehaviour {
         renderer = GetComponent<MeshRenderer>();
         foVController = GetComponentInChildren<FoVController>();
         renderer.sortingLayerName = "Lasers";
-        NeedToUpdate = true;
-        LastUpdated = Random.Range(-0.1f, 0f);
+        NeedToUpdate = false;
+        LastUpdated = 0f;
+        CalculateMesh();
     }
 
     // Update is called once per frame
     void Update() {
+        renderer.material.color = foVController.Color;
         if (transform.localPosition != -transform.parent.position)
         {
             transform.localPosition = -transform.parent.position;
             NeedToUpdate = true;
         }
 
-        if (renderer.isVisible && NeedToUpdate && Time.time > LastUpdated + 0.1) 
+        if (renderer.isVisible && (NeedToUpdate || Time.time > LastUpdated + 0.1)) 
         {
             CalculateMesh();
             NeedToUpdate = false;
@@ -81,7 +83,6 @@ public class FoVRender : MonoBehaviour {
         int[] indices = tr.Triangulate();
 
         Vector3[] vertices = new Vector3[polygon.Length];
-        renderer.material.color = foVController.Color;
         for (int i = 0; i < vertices.Length; i++)
         {
             vertices[i] = new Vector3(polygon[i].x, polygon[i].y, 0);
@@ -171,7 +172,7 @@ public class FoVRender : MonoBehaviour {
 //                }
 //            }
 
-            RaycastHit2D raycast = Physics2D.Raycast(ray.a, new Vector2(dx, dy));
+            RaycastHit2D raycast = Physics2D.Raycast(ray.a, new Vector2(dx, dy), float.MaxValue, 1 << WALL_LAYER);
             if (raycast.collider != null && raycast.distance < closestIntersect.z)
             {
                 closestIntersect = raycast.point;
