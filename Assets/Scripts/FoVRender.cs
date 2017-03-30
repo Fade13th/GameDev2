@@ -11,7 +11,7 @@ public class FoVRender : MonoBehaviour {
         public NoIntersectException(string message) : base(message) { }
     }
 
-    public bool NeedToUpdate { get; private set; }
+    public bool NeedToUpdate { get; set; }
     private List<Vector2[]> polygons;
     private List<float> angleOffsets = new List<float>(new float[] { -0.001f, 0f, 0.001f });
 

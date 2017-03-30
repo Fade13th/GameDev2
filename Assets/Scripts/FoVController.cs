@@ -9,6 +9,7 @@ public class FoVController : MonoBehaviour {
     public bool PlayerSeen { get; set; }
 
     private Color _playerVisible, _playerNotVisible;
+    private FoVRender _foVRender;
 
     public List<Vector2> Points {
         get {
@@ -38,9 +39,19 @@ public class FoVController : MonoBehaviour {
     public Color Color { get { return PlayerSeen ? _playerVisible : _playerNotVisible; } }
     public Vector2 Size { get; private set; }
 
+    public float Rotation { get { return transform.rotation.eulerAngles.z; }
+        set
+        {
+            transform.RotateAround(transform.parent.parent.position, Vector3.forward, value);
+            _foVRender.NeedToUpdate = true;
+    } }
+
 
     // Use this for initialization
-    void Start() {
+    void Start()
+    {
+        _foVRender = GetComponentInParent<FoVRender>();
+
         Offset = transform.localPosition;
         _playerVisible = Color.red;
         _playerVisible.a = 128 / 255f;
@@ -67,7 +78,9 @@ public class FoVController : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         this.transform.position = transform.parent.parent.position + Offset;
-   }
+        Rotation = 1;
+    }
+
 
     void OnTriggerStay2D(Collider2D collider) {
         if(collider.tag == "Player")
