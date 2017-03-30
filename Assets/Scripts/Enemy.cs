@@ -55,8 +55,7 @@ public class Enemy : MonoBehaviour {
             lastDirection = -lastDirection;
             moveVelocity += lastDirection * speed;
             FoVController fov = GetComponentInChildren<FoVController>();
-            fov.transform.rotation = Quaternion.Euler(0, 0, 90 * lastDirection);
-            fov.Offset = new Vector3(lastDirection * FOVXOffset, FOVYOffset, FOVZOffset);
+            fov.Rotation = 180;
 
             if (lastDirection > 0) {
                 anim.SetInteger("Direction", 3);

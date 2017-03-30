@@ -100,9 +100,4 @@ public class FoVController : MonoBehaviour {
         }
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawSphere(transform.parent.position, 0.1f);
-    }
 }
