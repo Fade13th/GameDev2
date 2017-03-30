@@ -42,9 +42,8 @@ public class FoVRender : MonoBehaviour {
         renderer = GetComponent<MeshRenderer>();
         foVController = GetComponentInChildren<FoVController>();
         renderer.sortingLayerName = "Lasers";
-        NeedToUpdate = false;
-        NextUpdate = Random.Range(0f, 0.2f);
-        CalculateMesh();
+        NeedToUpdate = true;
+        NextUpdate = -1f;
     }
 
     // Update is called once per frame
@@ -55,10 +54,11 @@ public class FoVRender : MonoBehaviour {
             NeedToUpdate = true;
         }
 
-        if(renderer.isVisible && (NeedToUpdate && Time.time > NextUpdate)) {
+        if(renderer.isVisible && (NeedToUpdate && Time.time > NextUpdate)) 
+        {
             CalculateMesh();
             NeedToUpdate = false;
-            NextUpdate = Time.time + 0.2f;
+            //NextUpdate = Time.time + 0.2f;
         }
     }
 
@@ -158,6 +158,7 @@ public class FoVRender : MonoBehaviour {
                 try {
                     Vector3 intersect = getIntersection(ray, line);
 
+                    intersect.z = ((Vector2) intersect- pos).magnitude;
                     if(intersect.z < closestIntersect.z) {
                         closestIntersect = intersect;
                     }
@@ -168,27 +169,35 @@ public class FoVRender : MonoBehaviour {
                 }
             }
 
+            Debug.DrawLine(pos, closestIntersect);
             RaycastHit2D raycast = Physics2D.Raycast(pos, vertex - pos, float.MaxValue, 1 << WALL_LAYER);
-            if(raycast.collider != null && raycast.distance < closestIntersect.z) {
+            if (raycast.collider != null && raycast.distance < closestIntersect.z)
+            {
                 closestIntersect = raycast.point;
                 closestIntersect.z = raycast.distance;
-                Vector2 normal = raycast.normal;
-                Vector2 surfacePos = new Vector2(normal.y, -normal.x) * colliderMag;
-                Vector2 surfaceNeg = new Vector2(-normal.y, normal.x) * colliderMag;
-
-                foreach(Line line in foVController.Edges) {
-                    try {
-                        //secondPassVertices.Add(getIntersection(new Line(raycast.point, surfacePos), line));
-                    }
-                    catch(NoIntersectException e) {
-                    }
-                    try {
-                        //secondPassVertices.Add(getIntersection(new Line(raycast.point, surfaceNeg), line));
-                    }
-                    catch(NoIntersectException e) {
-                        continue;
-                    }
-                }
+//                Debug.DrawLine(pos, raycast.point, Color.cyan);
+//                Vector2 normal = raycast.normal;
+//                Vector2 surfacePos = new Vector2(normal.y, -normal.x) * colliderMag;
+//                Vector2 surfaceNeg = new Vector2(-normal.y, normal.x) * colliderMag;
+//
+//                foreach (Line line in foVController.Edges)
+//                {
+//                    try
+//                    {
+//                        //secondPassVertices.Add(getIntersection(new Line(raycast.point, surfacePos), line));
+//                    }
+//                    catch (NoIntersectException e)
+//                    {
+//                    }
+//                    try
+//                    {
+//                        //secondPassVertices.Add(getIntersection(new Line(raycast.point, surfaceNeg), line));
+//                    }
+//                    catch (NoIntersectException e)
+//                    {
+//                        continue;
+//                    }
+//                }
             }
 
             if(closestIntersect.z == float.MaxValue) continue;
@@ -196,22 +205,22 @@ public class FoVRender : MonoBehaviour {
             intersects.Add(angle, closestIntersect);
         }
 
-        foreach (Vector3 vertex in secondPassVertices)
-        {
-
-            float angle = Mathf.Atan2(vertex.y - sightY, vertex.x - sightX);
-            Vector3 closestIntersect = vertex;
-            RaycastHit2D raycast = Physics2D.Raycast(pos, (Vector2) vertex - pos, float.MaxValue, 1 << WALL_LAYER);
-            if(raycast.collider != null && raycast.distance < closestIntersect.z) {
-                closestIntersect = raycast.point;
-                closestIntersect.z = raycast.distance;
-            }
-
-            if(closestIntersect.z == float.MaxValue) continue;
-
-            Debug.DrawLine(pos, closestIntersect, Color.green, 1);
-            intersects.Add(angle, closestIntersect);
-        }
+//        foreach (Vector3 vertex in secondPassVertices)
+//        {
+//
+//            float angle = Mathf.Atan2(vertex.y - sightY, vertex.x - sightX);
+//            Vector3 closestIntersect = vertex;
+//            RaycastHit2D raycast = Physics2D.Raycast(pos, (Vector2) vertex - pos, float.MaxValue, 1 << WALL_LAYER);
+//            if(raycast.collider != null && raycast.distance < closestIntersect.z) {
+//                closestIntersect = raycast.point;
+//                closestIntersect.z = raycast.distance;
+//            }
+//
+//            if(closestIntersect.z == float.MaxValue) continue;
+//
+//            Debug.DrawLine(pos, closestIntersect, Color.green, 1);
+//            intersects.Add(angle, closestIntersect);
+//        }
 
 
 
