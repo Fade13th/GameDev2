@@ -56,7 +56,7 @@ public class FoVRender : MonoBehaviour {
             NeedToUpdate = true;
         }
 
-        if (renderer.isVisible && (NeedToUpdate || Time.time > NextUpdate)) 
+        if (renderer.isVisible && (NeedToUpdate && Time.time > NextUpdate)) 
         {
             CalculateMesh();
             NeedToUpdate = false;
