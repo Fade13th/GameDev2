@@ -42,7 +42,7 @@ public class FoVController : MonoBehaviour {
     public float Rotation { get { return transform.rotation.eulerAngles.z; }
         set
         {
-            transform.RotateAround(transform.parent.parent.position, Vector3.forward, value);
+            transform.RotateAround(transform.parent.position, Vector3.forward, -value);
             _foVRender.NeedToUpdate = true;
     } }
 
@@ -50,9 +50,8 @@ public class FoVController : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
-        _foVRender = GetComponentInParent<FoVRender>();
+        _foVRender = transform.parent.GetComponentInChildren<FoVRender>();
 
-        Offset = transform.localPosition;
         _playerVisible = Color.red;
         _playerVisible.a = 128 / 255f;
         _playerNotVisible = Color.red;
@@ -77,8 +76,6 @@ public class FoVController : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        this.transform.position = transform.parent.parent.position + Offset;
-        Rotation = 1;
     }
 
 
@@ -103,4 +100,9 @@ public class FoVController : MonoBehaviour {
         }
     }
 
+    void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.parent.position, 0.1f);
+    }
 }

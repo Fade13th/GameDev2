@@ -40,7 +40,7 @@ public class FoVRender : MonoBehaviour {
 
         filter = GetComponent<MeshFilter>();
         renderer = GetComponent<MeshRenderer>();
-        foVController = GetComponentInChildren<FoVController>();
+        foVController = transform.parent.GetComponentInChildren<FoVController>();
         renderer.sortingLayerName = "Lasers";
         NeedToUpdate = true;
         NextUpdate = -1f;
