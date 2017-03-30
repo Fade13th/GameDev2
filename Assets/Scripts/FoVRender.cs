@@ -43,7 +43,7 @@ public class FoVRender : MonoBehaviour {
         foVController = GetComponentInChildren<FoVController>();
         renderer.sortingLayerName = "Lasers";
         NeedToUpdate = false;
-        LastUpdated = 0f;
+        NextUpdate = Random.Range(0f, 0.2f);
         CalculateMesh();
     }
 
@@ -56,15 +56,15 @@ public class FoVRender : MonoBehaviour {
             NeedToUpdate = true;
         }
 
-        if (renderer.isVisible && (NeedToUpdate || Time.time > LastUpdated + 0.1)) 
+        if (renderer.isVisible && (NeedToUpdate || Time.time > NextUpdate)) 
         {
             CalculateMesh();
             NeedToUpdate = false;
-            LastUpdated = Time.time;
+            NextUpdate = Time.time + 0.2f;
         }
     }
 
-    public float LastUpdated { get; set; }
+    public float NextUpdate { get; set; }
 
 
     private void CalculateMesh()
