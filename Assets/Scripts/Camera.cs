@@ -3,25 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Camera : MonoBehaviour {
-    GameObject player;
-    GameObject background;
+    public float rotStart = 0;
+    public float rotEnd = 120;
 
-    public double bottom = -1.5;
+    private float currRot;
 
-	// Use this for initialization
-	void Start () {
-        player = GameObject.Find("Player");
-        background = GameObject.Find("Background");
-	}
-	
+    public float rotSpeed = 0.5f;
+
+    public FoVRender fov;
+
+    private SpriteRenderer renderer;
+
+    void Start() {
+        currRot = rotStart;
+        renderer = GetComponent<SpriteRenderer>();
+    }
+
 	// Update is called once per frame
 	void Update () {
-        Vector3 pos = new Vector3(player.transform.position.x, player.transform.position.y, -2.7f);
+        currRot += rotSpeed;
 
-        if ((double)pos.y < bottom) {
-            pos.y = (float) bottom;        
+
+        if (currRot > 90) {
+            renderer.flipX = true;
+        }
+        else {
+            renderer.flipX = false;
         }
 
-        transform.position = pos;
+		if (currRot >= rotEnd || currRot <= 0) {
+            rotSpeed = -rotSpeed;
+        }  
 	}
 }
