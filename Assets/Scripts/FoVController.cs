@@ -87,6 +87,7 @@ public class FoVController : MonoBehaviour {
             RaycastHit2D raycast = Physics2D.Raycast(origin, direction);
             if(raycast.collider.CompareTag("Player")) { 
                 PlayerSeen = true;
+                Debug.DrawLine(origin, raycast.point);
             }
             else {
                 PlayerSeen = false;

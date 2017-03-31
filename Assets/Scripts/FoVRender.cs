@@ -140,17 +140,19 @@ public class FoVRender : MonoBehaviour {
 
     private Vector2[] getSightPolygon(float sightX, float sightY) {
         Vector2 pos = new Vector2(sightX, sightY);
-        float colliderSqMag = foVController.Size.sqrMagnitude * 1.1f;
-        float colliderMag = foVController.Size.magnitude * 1.1f;
 
         List<Vector2> vertices = new List<Vector2>();
-        List<Vector3> secondPassVertices = new List<Vector3>();
 
         //Cull points to test
+        Bounds bounds = foVController.GetComponent<PolygonCollider2D>().bounds;
         foreach(Vector2 point in wallObjectCorners) {
-            float distance = (point - pos).sqrMagnitude;
-            if(distance < colliderSqMag) {
-                vertices.Add(point);
+            
+            if(bounds.Contains(point)) {
+                Debug.DrawLine(pos, point);
+                //vertices.Add(point);
+                Vector2 normal = new Vector2(point.y - pos.y, pos.x - point.x).normalized;
+                vertices.Add(point + normal * 0.01f);
+                vertices.Add(point - normal * 0.01f);
             }
         }
 
