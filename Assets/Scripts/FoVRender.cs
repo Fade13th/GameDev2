@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
+using UnityEngine.Networking;
 using Random = UnityEngine.Random;
 
 public class FoVRender : MonoBehaviour {
@@ -12,6 +13,7 @@ public class FoVRender : MonoBehaviour {
     }
 
     public bool NeedToUpdate { get; set; }
+    public bool ForceUpdate { get; set; }
     private List<Vector2[]> polygons;
     private List<float> angleOffsets = new List<float>(new float[] { -0.001f, 0f, 0.001f });
 
@@ -22,6 +24,7 @@ public class FoVRender : MonoBehaviour {
 
     private int WALL_LAYER = 9;
     private FoVController foVController;
+    private PlayerController player;
 
     List<Vector2> wallObjectCorners;
     List<Line> wallObjectSegments;
@@ -41,9 +44,13 @@ public class FoVRender : MonoBehaviour {
         filter = GetComponent<MeshFilter>();
         renderer = GetComponent<MeshRenderer>();
         foVController = transform.parent.GetComponentInChildren<FoVController>();
+        player = PlayerController.GetPlayer();
+
         renderer.sortingLayerName = "Lasers";
+
         CalculateMesh();
         NeedToUpdate = false;
+        ForceUpdate = false;
         NextUpdate = -1f;
     }
 
@@ -55,13 +62,19 @@ public class FoVRender : MonoBehaviour {
             NeedToUpdate = true;
         }
 
-        if(renderer.isVisible && (NeedToUpdate && Time.time > NextUpdate)) 
+
+        if (ForceUpdate)
         {
             CalculateMesh();
+            ForceUpdate = false;
+        }else if (NeedToUpdate)
+        {
+            if (renderer.isVisible || (player.transform.position - transform.parent.position).sqrMagnitude < foVController.Size.sqrMagnitude * 1.5)
+            CalculateMesh();
             NeedToUpdate = false;
-            //NextUpdate = Time.time + 0.2f;
         }
     }
+
 
     public float NextUpdate { get; set; }
 
