@@ -42,7 +42,8 @@ public class FoVRender : MonoBehaviour {
         renderer = GetComponent<MeshRenderer>();
         foVController = transform.parent.GetComponentInChildren<FoVController>();
         renderer.sortingLayerName = "Lasers";
-        NeedToUpdate = true;
+        CalculateMesh();
+        NeedToUpdate = false;
         NextUpdate = -1f;
     }
 
