@@ -170,7 +170,6 @@ public class FoVRender : MonoBehaviour {
                 }
             }
 
-            Debug.DrawLine(pos, closestIntersect);
             RaycastHit2D raycast = Physics2D.Raycast(pos, vertex - pos, float.MaxValue, 1 << WALL_LAYER);
             if (raycast.collider != null && raycast.distance < closestIntersect.z)
             {
