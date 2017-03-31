@@ -15,6 +15,12 @@ public class PlayerController : MonoBehaviour {
 
     //Grounded Vars
     public bool isGrounded = true;
+    private static PlayerController _playerController;
+
+    void Awake()
+    {
+        PlayerController._playerController = this;
+    }
 
     void Start() {
         JumpButtonPressed = false;
@@ -65,5 +71,10 @@ public class PlayerController : MonoBehaviour {
             falling = false;
             isGrounded = true;
         }
+    }
+
+    public static PlayerController GetPlayer()
+    {
+        return _playerController;
     }
 }
