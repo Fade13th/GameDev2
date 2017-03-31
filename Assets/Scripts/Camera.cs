@@ -10,19 +10,28 @@ public class Camera : MonoBehaviour {
 
     public float rotSpeed = 0.5f;
 
-    public FoVRender fov;
+    public FoVController fov;
 
     private SpriteRenderer renderer;
+
+    public float rotationPause = 1.0f;
+    private float time;
 
     void Start() {
         currRot = rotStart;
         renderer = GetComponent<SpriteRenderer>();
+
+        time = Time.time;
     }
 
 	// Update is called once per frame
 	void Update () {
+        if (time > Time.time)
+            return;
+
         currRot += rotSpeed;
 
+        fov.Rotation = rotSpeed;
 
         if (currRot > 90) {
             renderer.flipX = true;
@@ -33,6 +42,8 @@ public class Camera : MonoBehaviour {
 
 		if (currRot >= rotEnd || currRot <= 0) {
             rotSpeed = -rotSpeed;
+
+            time = Time.time + rotationPause;
         }  
 	}
 }
