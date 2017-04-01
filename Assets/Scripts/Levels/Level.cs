@@ -1,13 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Level : MonoBehaviour {
 
     protected int stage;
 
+    protected Text objectiveText;
+
+    private bool fading = false;
+
     void Start() {
         stage = 0;
+        objectiveText = GameObject.Find("Objective").GetComponent<Text>();
+        updateObj();
+    }
+
+    void Update() {
+        if (fading) {
+            objectiveText.color = new Color(1, objectiveText.color.g + 0.01f, objectiveText.color.b + 0.01f);
+        }
     }
 
     public void progress() {
@@ -19,5 +32,8 @@ public class Level : MonoBehaviour {
         return stage;
     }
 
-    protected virtual void updateObj() { }
+    protected virtual void updateObj() {
+        fading = true;
+        objectiveText.color = Color.red;
+    }
 }

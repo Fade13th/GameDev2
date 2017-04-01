@@ -21,12 +21,11 @@ public class MainCamera : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
 	{
-
 	    zoomCurrent -= Input.GetAxis("Mouse ScrollWheel") * zoomSensitivty;
 	    zoomCurrent = Mathf.Clamp(zoomCurrent, zoomClose, zoomFar);
 	    Camera.main.fieldOfView = zoomCurrent;
         Vector3 pos = new Vector3(player.transform.position.x, player.transform.position.y, -2.7f);
-
+        
         if ((double)pos.y < bottom) {
             pos.y = (float) bottom;        
         }
