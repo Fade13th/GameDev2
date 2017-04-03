@@ -148,7 +148,6 @@ public class FoVRender : MonoBehaviour {
         foreach(Vector2 point in wallObjectCorners) {
             
             if(bounds.Contains(point)) {
-                Debug.DrawLine(pos, point);
                 //vertices.Add(point);
                 Vector2 normal = new Vector2(point.y - pos.y, pos.x - point.x).normalized;
                 vertices.Add(point + normal * 0.01f);
