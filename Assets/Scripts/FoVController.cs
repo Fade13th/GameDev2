@@ -80,23 +80,25 @@ public class FoVController : MonoBehaviour {
 
 
     void OnTriggerStay2D(Collider2D collider) {
-        if(collider.tag == "Player")
+        if(collider.tag == "PlayerFoVDetection")
         {
             Vector3 origin = transform.parent.position;
-            Vector3 direction = collider.transform.position - origin;
+            Vector3 direction = collider.bounds.center - origin;
             RaycastHit2D raycast = Physics2D.Raycast(origin, direction);
-            if(raycast.collider.CompareTag("Player")) { 
+            if(raycast.collider.CompareTag("PlayerFoVDetection") || raycast.collider.CompareTag("Player")) { 
                 PlayerSeen = true;
-                Debug.DrawLine(origin, raycast.point);
+                Debug.DrawLine(origin, raycast.point, Color.cyan);
             }
             else {
                 PlayerSeen = false;
+                Debug.DrawLine(origin, raycast.point, Color.red);
             }
         }
     }
 
+
     void OnTriggerExit2D(Collider2D collider) {
-        if(collider.tag == "Player") {
+        if(collider.tag == "PlayerFoVDetection") {
             PlayerSeen = false;
         }
     }
