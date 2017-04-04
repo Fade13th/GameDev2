@@ -102,6 +102,16 @@ public class FoVController : MonoBehaviour {
     }
 
 
+    void OnEnable()
+    {
+        if ( _foVRender != null)
+            _foVRender.gameObject.SetActive(true);
+    }
 
 
+    void OnDisable()
+    {
+        if ( _foVRender != null)
+        _foVRender.gameObject.SetActive(false);
+    }
 }

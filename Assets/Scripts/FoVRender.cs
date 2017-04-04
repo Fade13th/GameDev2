@@ -20,6 +20,7 @@ public class FoVRender : MonoBehaviour {
     public float angleStart = 0;
     public float angleFinish = Mathf.PI * 0.5f;
     public float radius = 10;
+    public float NextUpdate { get; set; }
 
 
     private int WALL_LAYER = 9;
@@ -76,8 +77,19 @@ public class FoVRender : MonoBehaviour {
     }
 
 
-    public float NextUpdate { get; set; }
 
+    void OnEnable()
+    {
+        if ( foVController != null)
+        foVController.gameObject.SetActive(true);
+    }
+
+
+    void OnDisable()
+    {
+        if ( foVController != null)
+        foVController.gameObject.SetActive(false);
+    }
 
     private void CalculateMesh() {
         polygons.Clear();
