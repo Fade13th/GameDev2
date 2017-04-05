@@ -19,10 +19,6 @@ public class PlayerController : MonoBehaviour {
     public bool isGrounded = true;
     private static PlayerController _playerController;
 
-    public int experience = 0;
-    public int reputation = 0;
-    public int infamy = 0;
-
     void Awake()
     {
         PlayerController._playerController = this;

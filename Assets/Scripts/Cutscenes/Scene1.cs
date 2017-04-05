@@ -97,7 +97,7 @@ public class Scene1 : Cutscene {
                 }
                 else if (response == 2) {
                     conversation.setDialogue("No! I'm telling the truth, I swear! Aren't I supposed to be innocent until proven guilty?!", false);
-                    player.infamy++;
+                    manager.infamy++;
                 }
 
                 resp1 = "I'm going to need access to the security camera footage.";
@@ -131,6 +131,7 @@ public class Scene1 : Cutscene {
                 break;
 
             case 10:
+                conversation.hide();
                 bool crooked = response == 0 ? false : true;
                 loadLevel(crooked);
 
@@ -142,10 +143,6 @@ public class Scene1 : Cutscene {
     }
 
     private void loadLevel(bool crooked) {
-        /*
-        Level level1 = GameObject.Instantiate(nextLevel);
-        level1.crooked = crooked;
-
-        Destroy(this.gameObject);*/
+        StartCoroutine(manager.nextLevel());
     }
 }

@@ -15,6 +15,7 @@ public class Cutscene : MonoBehaviour {
     protected int stage = -1;
 
     protected PlayerController player;
+    protected LevelManager manager;
 
     public Level nextLevel;
 
@@ -41,10 +42,11 @@ public class Cutscene : MonoBehaviour {
         updating = true;
 
         player = GameObject.Find("Player").GetComponent<PlayerController>();
-	}
-	
-	// Update is called once per frame
-	void Update () {
+        manager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+    }
+
+    // Update is called once per frame
+    void Update () {
 		if (updating) {
             conversation.disableResponse();
 

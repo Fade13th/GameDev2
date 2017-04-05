@@ -13,14 +13,25 @@ public class MainCamera : MonoBehaviour {
 
     // Use this for initialization
 	void Start () {
+        reset();
+	}
+
+    public bool reset() {
         player = GameObject.Find("Player");
         background = GameObject.Find("Background");
 	    zoomCurrent = Camera.main.fieldOfView;
-	}
+
+        return player != null;
+    }
 	
 	// Update is called once per frame
 	void Update ()
 	{
+        if (player == null) {
+            if (!reset())
+                return;
+        }
+        
 	    zoomCurrent -= Input.GetAxis("Mouse ScrollWheel") * zoomSensitivty;
 	    zoomCurrent = Mathf.Clamp(zoomCurrent, zoomClose, zoomFar);
 	    Camera.main.fieldOfView = zoomCurrent;

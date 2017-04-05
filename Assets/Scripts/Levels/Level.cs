@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Level : MonoBehaviour {
+    protected LevelManager manager;
 
     protected int stage;
 
@@ -18,8 +19,7 @@ public class Level : MonoBehaviour {
         objectiveText = GameObject.Find("Objective").GetComponent<Text>();
         updateObj();
 
-        Background background = GameObject.Find("Background").GetComponent<Background>();
-        background.reset();
+        manager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
     }
 
     void Update() {
