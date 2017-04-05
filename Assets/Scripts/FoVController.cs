@@ -7,6 +7,7 @@ using UnityEngine.Assertions.Comparers;
 public class FoVController : MonoBehaviour {
 
     public bool PlayerSeen { get; set; }
+    private int RaycastMask { get; set; }
 
     private Color _playerVisible, _playerNotVisible;
     private FoVRender _foVRender;
@@ -51,7 +52,7 @@ public class FoVController : MonoBehaviour {
     void Start()
     {
         _foVRender = transform.parent.GetComponentInChildren<FoVRender>();
-
+        RaycastMask = 1 << LayerMask.NameToLayer("Walls") | 1 << LayerMask.NameToLayer("PlayerFoVDetection");
         _playerVisible = Color.red;
         _playerVisible.a = 128 / 255f;
         _playerNotVisible = Color.red;
@@ -75,30 +76,42 @@ public class FoVController : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update() {
+    void FixedUpdate()
+    {
+        PlayerSeen = false;
     }
+
 
 
     void OnTriggerStay2D(Collider2D collider) {
-        if(collider.tag == "Player")
+        if (collider.tag == "PlayerFoVDetection")
         {
             Vector3 origin = transform.parent.position;
-            Vector3 direction = collider.transform.position - origin;
-            RaycastHit2D raycast = Physics2D.Raycast(origin, direction);
-            if(raycast.collider.CompareTag("Player")) { 
+            Vector3 direction = collider.bounds.center - origin;
+            RaycastHit2D raycast = Physics2D.Raycast(origin, direction, float.MaxValue, RaycastMask);
+            if (raycast.collider.CompareTag("PlayerFoVDetection") || raycast.collider.CompareTag("Player"))
+            {
                 PlayerSeen = true;
-                Debug.DrawLine(origin, raycast.point);
+                Debug.DrawLine(origin, raycast.point, Color.cyan);
             }
-            else {
-                PlayerSeen = false;
+            else
+            {
+                Debug.DrawLine(origin, raycast.point, Color.red);
             }
         }
     }
 
-    void OnTriggerExit2D(Collider2D collider) {
-        if(collider.tag == "Player") {
-            PlayerSeen = false;
-        }
+
+    void OnEnable()
+    {
+        if ( _foVRender != null)
+            _foVRender.gameObject.SetActive(true);
     }
 
+
+    void OnDisable()
+    {
+        if ( _foVRender != null)
+        _foVRender.gameObject.SetActive(false);
+    }
 }
