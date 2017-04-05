@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour {
     float moveVelocity;
     public bool JumpButtonPressed { get; set; }
 
+    public int cutsceneWalk = 0;
+
     public Animator anim;
 
     public bool falling = false;
@@ -16,6 +18,10 @@ public class PlayerController : MonoBehaviour {
     //Grounded Vars
     public bool isGrounded = true;
     private static PlayerController _playerController;
+
+    public int experience = 0;
+    public int reputation = 0;
+    public int infamy = 0;
 
     void Awake()
     {
@@ -51,11 +57,11 @@ public class PlayerController : MonoBehaviour {
         moveVelocity = 0;
 
         //Left Right Movement
-        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) {
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A) || cutsceneWalk == -1) {
             moveVelocity = -speed;
             anim.SetInteger("Direction", 1);
         }
-        else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D)) {
+        else if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D) || cutsceneWalk == 1) {
             moveVelocity = speed;
             anim.SetInteger("Direction", 3);
         }
@@ -65,6 +71,7 @@ public class PlayerController : MonoBehaviour {
         GetComponent<Rigidbody2D>().velocity = new Vector2(moveVelocity, GetComponent<Rigidbody2D>().velocity.y);
 
     }
+
     //Check if Grounded
     void OnTriggerEnter2D(Collider2D collider) {
         if ((collider.tag == "Floor" || collider.tag == "Platform") && collider.transform.position.y < transform.position.y) {

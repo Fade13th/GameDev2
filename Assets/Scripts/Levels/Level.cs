@@ -7,6 +7,8 @@ public class Level : MonoBehaviour {
 
     protected int stage;
 
+    public bool crooked = false;
+
     protected Text objectiveText;
 
     private bool fading = false;
@@ -15,6 +17,9 @@ public class Level : MonoBehaviour {
         stage = 0;
         objectiveText = GameObject.Find("Objective").GetComponent<Text>();
         updateObj();
+
+        Background background = GameObject.Find("Background").GetComponent<Background>();
+        background.reset();
     }
 
     void Update() {

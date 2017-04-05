@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Level_1 : Level {
-    public bool crooked = false;
-
     protected override void updateObj() {
         base.updateObj();
         switch (stage) {
