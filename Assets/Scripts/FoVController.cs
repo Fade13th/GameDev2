@@ -48,10 +48,14 @@ public class FoVController : MonoBehaviour {
     } }
 
 
+    void Awake()
+    {
+        gameObject.layer = LayerMask.NameToLayer("FoVColliders");
+    }
+
     // Use this for initialization
     void Start()
     {
-        gameObject.layer = LayerMask.NameToLayer("FoVColliders");
         _foVRender = transform.parent.GetComponentInChildren<FoVRender>();
         RaycastMask = 1 << LayerMask.NameToLayer("Walls") | 1 << LayerMask.NameToLayer("PlayerFoVDetection") | 1 << LayerMask.NameToLayer("Platforms");
         _playerVisible = Color.red;
