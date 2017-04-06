@@ -51,8 +51,9 @@ public class FoVController : MonoBehaviour {
     // Use this for initialization
     void Start()
     {
+        gameObject.layer = LayerMask.NameToLayer("FoVColliders");
         _foVRender = transform.parent.GetComponentInChildren<FoVRender>();
-        RaycastMask = 1 << LayerMask.NameToLayer("Walls") | 1 << LayerMask.NameToLayer("PlayerFoVDetection");
+        RaycastMask = 1 << LayerMask.NameToLayer("Walls") | 1 << LayerMask.NameToLayer("PlayerFoVDetection") | 1 << LayerMask.NameToLayer("Platforms");
         _playerVisible = Color.red;
         _playerVisible.a = 128 / 255f;
         _playerNotVisible = Color.red;
@@ -92,7 +93,7 @@ public class FoVController : MonoBehaviour {
             if (raycast.collider.CompareTag("PlayerFoVDetection") || raycast.collider.CompareTag("Player"))
             {
                 PlayerSeen = true;
-                Debug.DrawLine(origin, raycast.point, Color.cyan);
+                Debug.DrawLine(origin, raycast.point, Color.magenta);
             }
             else
             {

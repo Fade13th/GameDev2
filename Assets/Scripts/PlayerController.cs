@@ -37,17 +37,22 @@ public class PlayerController : MonoBehaviour {
             JumpButtonPressed = false;
         }
 
-        if (JumpButtonPressed && isGrounded) {
+        if (JumpButtonPressed && isGrounded)
+        {
             GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, jump);
             isGrounded = false;
             JumpButtonPressed = false;
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), true);
         }
+
 
         if (Input.GetKey(KeyCode.S)) {
             falling = true;
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), true);
         }
-        else {
+        else if(Input.GetKeyUp(KeyCode.S) || GetComponent<Rigidbody2D>().velocity.y < 0 ) {
             falling = false;
+            Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), false);
         }
 
         moveVelocity = 0;

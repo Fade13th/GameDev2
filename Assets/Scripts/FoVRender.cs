@@ -23,7 +23,11 @@ public class FoVRender : MonoBehaviour {
     public float NextUpdate { get; set; }
 
 
-    private int WALL_LAYER = 9;
+    private int FoVMask;
+    private int ReboundMask;
+    private int orignalLayer;
+    private int reboundLayer;
+
     private FoVController foVController;
     private PlayerController player;
 
@@ -49,6 +53,10 @@ public class FoVRender : MonoBehaviour {
 
         renderer.sortingLayerName = "Lasers";
 
+        FoVMask = 1 << LayerMask.NameToLayer("Walls") | 1 << LayerMask.NameToLayer("Platforms");
+        ReboundMask = 1 << LayerMask.NameToLayer("CurrentFoVCollider");
+        orignalLayer = foVController.gameObject.layer;
+        reboundLayer = LayerMask.NameToLayer("CurrentFoVCollider"); 
         CalculateMesh();
         NeedToUpdate = false;
         ForceUpdate = false;
@@ -159,11 +167,11 @@ public class FoVRender : MonoBehaviour {
         Bounds bounds = foVController.GetComponent<PolygonCollider2D>().bounds;
         foreach(Vector2 point in wallObjectCorners) {
             
-            if(bounds.Contains(point)) {
-                //vertices.Add(point);
-                Vector2 normal = new Vector2(point.y - pos.y, pos.x - point.x).normalized;
-                vertices.Add(point + normal * 0.01f);
-                vertices.Add(point - normal * 0.01f);
+            if(true ||bounds.Contains(point)) {
+                vertices.Add(point);
+//                Vector2 normal = new Vector2(point.y - pos.y, pos.x - point.x).normalized;
+//                vertices.Add(point + normal * 0.01f);
+//                vertices.Add(point - normal * 0.01f);
             }
         }
 
@@ -177,31 +185,44 @@ public class FoVRender : MonoBehaviour {
         foreach(Vector2 vertex in vertices) {
             float angle = Mathf.Atan2(vertex.y - sightY, vertex.x - sightX);
 
-            Line ray = new Line(pos, vertex);
 
-            Vector3 closestIntersect = new Vector3(0, 0, float.MaxValue);
+            Vector3 closestIntersect;
 
-            foreach(Line line in foVController.Edges) {
-                try {
-                    Vector3 intersect = getIntersection(ray, line);
+//            foreach(Line line in foVController.Edges) {
+//                try {
+//                    Vector3 intersect = getIntersection(ray, line);
+//
+//                    intersect.z = ((Vector2) intersect- pos).magnitude;
+//                    if(intersect.z < closestIntersect.z) {
+//                        closestIntersect = intersect;
+//                    }
+//                }
+//                catch(NoIntersectException e) {
+//                    //Dirty using an exception for this, but it won't let you return null
+//                    continue;
+//                }
+//            }
 
-                    intersect.z = ((Vector2) intersect- pos).magnitude;
-                    if(intersect.z < closestIntersect.z) {
-                        closestIntersect = intersect;
-                    }
+            RaycastHit2D raycast = Physics2D.Raycast(pos, vertex - pos, float.MaxValue, FoVMask);
+            if (raycast.collider != null) // && raycast.distance < closestIntersect.z)
+            {
+
+                foVController.gameObject.layer = reboundLayer;
+                RaycastHit2D rebound = Physics2D.Raycast(raycast.point, vertex - raycast.point, raycast.distance,
+                    ReboundMask);
+                foVController.gameObject.layer = orignalLayer;
+
+                if (rebound.collider != null)
+                {
+                    closestIntersect = rebound.point;
+                    //Debug.DrawLine(rebound.point, raycast.point, Color.red);
+                    Debug.DrawLine(pos, raycast.point, Color.cyan);
                 }
-                catch(NoIntersectException e) {
-                    //Dirty using an exception for this, but it won't let you return null
+                else
+                {
+                    Debug.DrawLine(pos, raycast.point, Color.green);
                     continue;
                 }
-            }
-
-            RaycastHit2D raycast = Physics2D.Raycast(pos, vertex - pos, float.MaxValue, 1 << WALL_LAYER);
-            if (raycast.collider != null && raycast.distance < closestIntersect.z)
-            {
-                closestIntersect = raycast.point;
-                closestIntersect.z = raycast.distance;
-//                Debug.DrawLine(pos, raycast.point, Color.cyan);
 //                Vector2 normal = raycast.normal;
 //                Vector2 surfacePos = new Vector2(normal.y, -normal.x) * colliderMag;
 //                Vector2 surfaceNeg = new Vector2(-normal.y, normal.x) * colliderMag;
@@ -225,8 +246,11 @@ public class FoVRender : MonoBehaviour {
 //                    }
 //                }
             }
+            else
+            {
+                continue;
+            }
 
-            if(closestIntersect.z == float.MaxValue) continue;
 
             intersects.Add(angle, closestIntersect);
         }
@@ -276,7 +300,7 @@ public class FoVRender : MonoBehaviour {
         List<GameObject> wallObjects = new List<GameObject>();
 
         foreach(GameObject obj in allObjects) {
-            if(obj.layer == WALL_LAYER)
+            if(obj.layer == LayerMask.NameToLayer("Walls") || obj.layer == LayerMask.NameToLayer("Platforms"))
                 wallObjects.Add(obj);
         }
 
