@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour {
     void Awake()
     {
         PlayerController._playerController = this;
+        gameObject.layer = LayerMask.NameToLayer("Player");
     }
 
     void Start() {

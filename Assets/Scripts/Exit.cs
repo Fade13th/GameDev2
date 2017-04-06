@@ -8,8 +8,9 @@ public class Exit : Interactable {
     public int stage;
 
     protected override void use() {
-        if (level.getStage() == stage) {
-            print("Exit");
+        if (level.getStage() == stage)
+        {
+            StartCoroutine( LevelManager.GetLevelManager().nextLevel());
         }
     }
 }
