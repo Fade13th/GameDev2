@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LevelManager : MonoBehaviour {
+public class LevelManager : MonoBehaviour
+{
+
+    public static LevelManager levelManager;
     public Level[] levels;
     public Cutscene[] cutscenes;
 
-    int currentScene = 0, currentLevel = 0;
+    int currentScene = 0, currentLevel =-1;
 
     private Level level;
     private Cutscene scene;
@@ -21,6 +24,12 @@ public class LevelManager : MonoBehaviour {
     public int experience = 0;
     public int reputation = 0;
     public int infamy = 0;
+
+    void Awake()
+    {
+        levelManager = this;
+    }
+
 
     // Use this for initialization
     void Start () {
@@ -72,15 +81,26 @@ public class LevelManager : MonoBehaviour {
 
         yield return new WaitForSeconds(1.5f);
         targetAlpha = 0;
+        currentLevel++;
 
-        if (currentLevel > 0)
+        if (level != null)
             OnLevelExit();
         
         if (scene != null)
             OnSceneExit();
 
         OnLevelStart();
-        currentLevel++;
+    }
+
+    public IEnumerator resetLevel()
+    {
+        bFade = true;
+        yield return new WaitForSeconds(1.5f);
+        targetAlpha = 0;
+
+        OnLevelExit();
+
+        OnLevelStart();
     }
 
     private IEnumerator waitToFade(float time) {
@@ -106,7 +126,12 @@ public class LevelManager : MonoBehaviour {
     }
 
     private void OnLevelExit() {
-        Destroy(level);
+        Destroy(level.gameObject);
         level = null;
+    }
+
+    public static LevelManager GetLevelManager()
+    {
+        return levelManager;
     }
 }

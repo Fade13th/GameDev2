@@ -168,10 +168,10 @@ public class FoVRender : MonoBehaviour {
         foreach(Vector2 point in wallObjectCorners) {
             
             if(true ||bounds.Contains(point)) {
-                vertices.Add(point);
-//                Vector2 normal = new Vector2(point.y - pos.y, pos.x - point.x).normalized;
-//                vertices.Add(point + normal * 0.01f);
-//                vertices.Add(point - normal * 0.01f);
+//                vertices.Add(point);
+                Vector2 normal = new Vector2(point.y - pos.y, pos.x - point.x).normalized;
+                vertices.Add(point + normal * 0.01f);
+                vertices.Add(point - normal * 0.01f);
             }
         }
 
@@ -251,8 +251,10 @@ public class FoVRender : MonoBehaviour {
                 continue;
             }
 
-
-            intersects.Add(angle, closestIntersect);
+            if (!intersects.ContainsKey(angle))
+            {
+                intersects.Add(angle, closestIntersect);
+            }
         }
 
 //        foreach (Vector3 vertex in secondPassVertices)

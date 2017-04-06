@@ -51,6 +51,7 @@ public class FoVController : MonoBehaviour {
     void Awake()
     {
         gameObject.layer = LayerMask.NameToLayer("FoVColliders");
+        PlayerSeen = false;
     }
 
     // Use this for initialization
@@ -83,12 +84,14 @@ public class FoVController : MonoBehaviour {
     // Update is called once per frame
     void FixedUpdate()
     {
-        PlayerSeen = false;
+        //PlayerSeen = false;
     }
 
 
 
-    void OnTriggerStay2D(Collider2D collider) {
+    void OnTriggerStay2D(Collider2D collider)
+    {
+        if (PlayerSeen) return;
         if (collider.tag == "PlayerFoVDetection")
         {
             Vector3 origin = transform.parent.position;
@@ -98,6 +101,9 @@ public class FoVController : MonoBehaviour {
             {
                 PlayerSeen = true;
                 Debug.DrawLine(origin, raycast.point, Color.magenta);
+
+                StartCoroutine( LevelManager.GetLevelManager().resetLevel());
+
             }
             else
             {
