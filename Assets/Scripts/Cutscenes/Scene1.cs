@@ -130,9 +130,11 @@ public class Scene1 : Cutscene {
                 conversation.setDialogue("*How would you like to proceed*", false);
 
                 resp1 = "Sneak in an copy the files from the computer for later analysis.";
+                setResp1Icon(1);
                 func.Add(updateResp1);
 
                 resp2 = "Sneak in and plant incriminating data on the computer to use as leverage.";
+                setResp2Icon(-1);
                 func.Add(updateResp2);
                 break;
 

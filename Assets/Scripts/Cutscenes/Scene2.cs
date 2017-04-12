@@ -120,9 +120,11 @@ public class Scene2 : Cutscene {
                     conversation.setDialogue("*How would you like to proceed*", false);
 
                     resp1 = "Look for information regarding the truck's whereabouts and contents.";
+                    setResp1Icon(1);
                     func.Add(updateResp1);
 
                     resp2 = "Plant incriminating evidence to blackmail the owner into talking.";
+                    setResp2Icon(-1);
                     func.Add(updateResp2);
                     break;
 

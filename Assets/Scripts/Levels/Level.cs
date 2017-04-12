@@ -10,16 +10,18 @@ public class Level : MonoBehaviour {
 
     public bool crooked = false;
 
-    protected Text objectiveText;
+    protected static Text objectiveText;
 
     private bool fading = false;
 
-    void Start() {
+    void Awake() {
         stage = 0;
         objectiveText = GameObject.Find("Objective").GetComponent<Text>();
-        updateObj();
+        manager = LevelManager.GetLevelManager();
+    }
 
-        manager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+    void Start() {
+        updateObj();
     }
 
     void Update() {

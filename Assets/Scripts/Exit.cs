@@ -9,7 +9,6 @@ public class Exit : Interactable {
 
     protected override void use() {
         if (level.getStage() == stage) {
-            print(stage);
             level.progress();
         }
     }

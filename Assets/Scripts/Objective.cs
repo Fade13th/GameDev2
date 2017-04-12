@@ -9,6 +9,7 @@ public class Objective : Interactable {
     public Level level;
 
     protected override void use() {
-        level.progress();
+        if (stage == level.getStage())
+            level.progress();
     }
 }

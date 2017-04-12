@@ -163,9 +163,9 @@ public class LevelManager : MonoBehaviour {
     }
 
     private void OnLevelStart() {
-        levelUI.alpha = 1;
-
         level = GameObject.Instantiate(levels[currentLevel]);
+
+        levelUI.alpha = 1;
         level.GetComponent<Level>().crooked = crooked;
         level.GetComponent<Level>().updateObj();
     }
