@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Cutscene : MonoBehaviour {
     protected Conversation conversation;
@@ -17,20 +18,57 @@ public class Cutscene : MonoBehaviour {
     protected PlayerController player;
     protected LevelManager manager;
 
-    public Level nextLevel;
-
     public Sprite[] sprites;
+    public Sprite[] responseIcons;
+
+    protected bool crooked;
 
     protected void updateResp1() {
         conversation.setResponse1(resp1);
+    }
+
+    protected void setResp1Icon(int icon) {
+        if (icon == -1) {
+            conversation.setResponse1Icon(responseIcons[1]);
+        }
+        else if (icon == 1) {
+            conversation.setResponse1Icon(responseIcons[2]);
+        }
+        else {
+            conversation.setResponse1Icon(responseIcons[3]);
+        }
     }
 
     protected void updateResp2() {
         conversation.setResponse2(resp2);
     }
 
+    protected void setResp2Icon(int icon) {
+        if (icon == -1) {
+            conversation.setResponse2Icon(responseIcons[1]);
+        }
+        else if (icon == 1) {
+            conversation.setResponse2Icon(responseIcons[2]);
+        }
+        else {
+            conversation.setResponse2Icon(responseIcons[3]);
+        }
+    }
+
     protected void updateResp3() {
         conversation.setResponse3(resp3);
+    }
+
+    protected void setResp3Icon(int icon) {
+        if (icon == -1) {
+            conversation.setResponse3Icon(responseIcons[1]);
+        }
+        else if (icon == 1) {
+            conversation.setResponse3Icon(responseIcons[2]);
+        }
+        else {
+            conversation.setResponse3Icon(responseIcons[3]);
+        }
     }
 
     // Use this for initialization
@@ -38,11 +76,11 @@ public class Cutscene : MonoBehaviour {
         conversation = GameObject.Find("Conversation").GetComponent<Conversation>();
         func = new List<Func>();
 
+        player = PlayerController.GetPlayer();
+        manager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+
         stepCutscene(0);
         updating = true;
-
-        player = GameObject.Find("Player").GetComponent<PlayerController>();
-        manager = GameObject.Find("LevelManager").GetComponent<LevelManager>();
     }
 
     // Update is called once per frame
@@ -60,20 +98,24 @@ public class Cutscene : MonoBehaviour {
 	}
 
     public virtual void stepCutscene(int response) {
+        setResp1Icon(0);
+        setResp2Icon(0);
+        setResp3Icon(0);
+
         stage++;
         updating = true;
     }
 
     protected void walk(int direction, float time) {
-        player.cutsceneWalk = direction;
+        player.setCutsceneDirection(direction);
         StartCoroutine(WalkWait(time));
-
     }
 
     protected IEnumerator WalkWait(float time) {
         yield return new WaitForSeconds(time);
-        player.cutsceneWalk = 0;
-        
+
+        player.setCutsceneDirection(0);
+                
         stepCutscene(0);
     }
 }

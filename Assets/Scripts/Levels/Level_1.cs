@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Level_1 : Level {
-    protected override void updateObj() {
+    public override void updateObj() {
         base.updateObj();
+
         switch (stage) {
             case 0:
                 if (!crooked)
@@ -17,8 +18,25 @@ public class Level_1 : Level {
                 objectiveText.text = "Objective: Exit through the window you entered";
                 break;
 
+            case 2:
+                nextLevel();
+                break;
+
             default:
                 break;
         }
+    }
+
+    private void nextLevel() {
+        manager.addExperience(10);
+
+        if (crooked) {
+            manager.addInfamy(10);
+        }
+        else {
+            manager.addReputation(10);
+        }
+
+        LevelManager.GetLevelManager().levelComplete();
     }
 }

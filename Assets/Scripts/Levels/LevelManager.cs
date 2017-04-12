@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class LevelManager : MonoBehaviour
-{
+public class LevelManager : MonoBehaviour {
 
     public static LevelManager levelManager;
     public Level[] levels;
@@ -14,22 +14,29 @@ public class LevelManager : MonoBehaviour
     private Level level;
     private Cutscene scene;
 
-    CanvasGroup levelUI;
+    CanvasGroup levelUI, levelCompleteUI;
 
     private CanvasGroup canvas;
     private float targetAlpha = 0;
     private bool bFade = false;
     private float step = 0.1f;
 
-    public int experience = 0;
-    public int reputation = 0;
-    public int infamy = 0;
+    private int experience = 0;
+    private int reputation = 0;
+    private int infamy = 0;
+    private int strikes = 0;
+    private int camSpots = 0;
+    private int guardSpots = 0;
+    private int laserSpots = 0;
+
+    private bool crooked;
+
+    private Text completeRank, completeStrike, completeCamera, completeGuard, completeLaser, completeRep, completeInf;
 
     void Awake()
     {
         levelManager = this;
     }
-
 
     // Use this for initialization
     void Start () {
@@ -38,6 +45,17 @@ public class LevelManager : MonoBehaviour
 
         canvas = GetComponent<CanvasGroup>();
         levelUI = GameObject.Find("Level_UI").GetComponent<CanvasGroup>();
+        levelCompleteUI = GameObject.Find("LevelComplete").GetComponent<CanvasGroup>();
+        levelCompleteUI.alpha = 0;
+        levelCompleteUI.blocksRaycasts = false;
+
+        completeRank = GameObject.Find("Rank").GetComponent<Text>();
+        completeStrike = GameObject.Find("Strikes").GetComponent<Text>();
+        completeCamera = GameObject.Find("CameraSpots").GetComponent<Text>();
+        completeGuard = GameObject.Find("GuardSpots").GetComponent<Text>();
+        completeLaser = GameObject.Find("LaserSpots").GetComponent<Text>();
+        completeRep = GameObject.Find("Reputation").GetComponent<Text>();
+        completeInf = GameObject.Find("Infamy").GetComponent<Text>();
 
         if (cutscenes.Length != 0)
             StartCoroutine(nextScene());
@@ -60,17 +78,48 @@ public class LevelManager : MonoBehaviour
         }
     }
 
+    public void setCrooked(bool crooked) {
+        this.crooked = crooked;
+    }
+
+    public void addInfamy(int i) {
+        infamy += i;
+    }
+
+    public void addReputation(int i) {
+        reputation += i;
+    }
+
+    public void addExperience(int i) {
+        experience += i;
+    }
+
+    public void next() {
+        if (scene != null)
+            OnSceneExit();
+
+        if (level != null)
+            OnLevelExit();
+
+        levelCompleteUI.alpha = 0;
+        levelCompleteUI.blocksRaycasts = false;
+
+        if (currentScene > currentLevel + 1) {
+            StartCoroutine(nextLevel());
+        }
+        else if (currentScene < cutscenes.Length) {
+            StartCoroutine(nextScene());
+        }
+        else if (currentLevel + 1 < levels.Length) {
+            StartCoroutine(nextLevel());
+        }
+    }
+
     public IEnumerator nextScene() {
         bFade = true;
 
         yield return new WaitForSeconds(1.5f);
         targetAlpha = 0;
-
-        if (currentScene > 0)
-            OnSceneExit();
-
-        if (level != null)
-            OnLevelExit();
 
         OnSceneStart();
         currentScene++;
@@ -82,12 +131,6 @@ public class LevelManager : MonoBehaviour
         yield return new WaitForSeconds(1.5f);
         targetAlpha = 0;
         currentLevel++;
-
-        if (level != null)
-            OnLevelExit();
-        
-        if (scene != null)
-            OnSceneExit();
 
         OnLevelStart();
     }
@@ -123,6 +166,8 @@ public class LevelManager : MonoBehaviour
         levelUI.alpha = 1;
 
         level = GameObject.Instantiate(levels[currentLevel]);
+        level.GetComponent<Level>().crooked = crooked;
+        level.GetComponent<Level>().updateObj();
     }
 
     private void OnLevelExit() {
@@ -133,5 +178,36 @@ public class LevelManager : MonoBehaviour
     public static LevelManager GetLevelManager()
     {
         return levelManager;
+    }
+
+    public void laserSpot() {
+        laserSpots++;
+        StartCoroutine(resetLevel());
+    }
+
+    public void guardSpot() {
+        guardSpots++;
+        StartCoroutine(resetLevel());
+    }
+
+    public void cameraSpot() {
+        camSpots++;
+    }
+
+    public void levelComplete() {
+        levelUI.blocksRaycasts = false;
+
+        completeRank.text = Config.getConfig().getRank(experience);
+        completeCamera.text = camSpots + "";
+        completeGuard.text = guardSpots + "";
+        completeLaser.text = laserSpots + "";
+        completeStrike.text = Config.getConfig().getStrikes(camSpots, guardSpots, laserSpots) + "";
+        completeRep.text = Config.getConfig().getRep(reputation);
+        completeInf.text = Config.getConfig().getInf(infamy);
+
+        levelCompleteUI.alpha = 1;
+        levelCompleteUI.blocksRaycasts = true;
+        levelCompleteUI.interactable = true;
+        PlayerController.GetPlayer().cutscene = true;
     }
 }

@@ -12,6 +12,9 @@ public class FoVController : MonoBehaviour {
     private Color _playerVisible, _playerNotVisible;
     private FoVRender _foVRender;
 
+    public float sightBuffer = 0.5f;
+    private float lastSeen;
+
     public List<Vector2> Points {
         get {
             Vector2[] localPoints = GetComponent<PolygonCollider2D>().points;
@@ -87,13 +90,10 @@ public class FoVController : MonoBehaviour {
         //PlayerSeen = false;
     }
 
+    void OnTriggerStay2D(Collider2D collider) {
+        if (PlayerSeen || lastSeen > Time.time) return;
 
-
-    void OnTriggerStay2D(Collider2D collider)
-    {
-        if (PlayerSeen) return;
-        if (collider.tag == "PlayerFoVDetection")
-        {
+        if (collider.tag == "PlayerFoVDetection") {
             Vector3 origin = transform.parent.position;
             Vector3 direction = collider.bounds.center - origin;
             RaycastHit2D raycast = Physics2D.Raycast(origin, direction, float.MaxValue, RaycastMask);
@@ -102,8 +102,15 @@ public class FoVController : MonoBehaviour {
                 PlayerSeen = true;
                 Debug.DrawLine(origin, raycast.point, Color.magenta);
 
-                StartCoroutine( LevelManager.GetLevelManager().resetLevel());
-
+                if (GetComponentInParent<CCTVCamera>() != null) {
+                    LevelManager.GetLevelManager().cameraSpot();
+                }
+                else if (GetComponentInParent<Enemy>() != null) {
+                    LevelManager.GetLevelManager().guardSpot();
+                }
+                else if (GetComponentInParent<Toggle>() != null) {
+                    LevelManager.GetLevelManager().laserSpot();
+                }
             }
             else
             {
@@ -112,6 +119,12 @@ public class FoVController : MonoBehaviour {
         }
     }
 
+    void OnTriggerExit2D(Collider2D collider) {
+        if (collider.tag == "PlayerFoVDetection") {
+            PlayerSeen = false;
+            lastSeen = Time.time + sightBuffer;
+        }
+    }
 
     void OnEnable()
     {

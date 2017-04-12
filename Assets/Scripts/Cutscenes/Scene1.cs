@@ -17,7 +17,7 @@ public class Scene1 : Cutscene {
                 conversation.setPlayerImage(sprites[0]);
                 conversation.setOtherImage(sprites[1]);
 
-                conversation.setOtherName("Officer G. Billy");
+                conversation.setOtherName("Officer\nG. Billy");
 
                 conversation.setDialogue("Good that you're here detective, this one's out of my league.", false);
 
@@ -76,28 +76,34 @@ public class Scene1 : Cutscene {
                 conversation.setOtherImage(sprites[2]);
                 conversation.show();
 
-                conversation.setOtherName("Border Guard J. Mason");
+                conversation.setOtherName("Border Guard\nJ. Mason");
 
                 conversation.setDialogue("", true);
                 conversation.setDialogue("I've already told you lot, I've got no idea what happened! He didn't even make any noise.", false);
                 
                 resp1 = "Calm down, I'm not here to point fingers. I just want to ask some questions.";
+                setResp1Icon(1);
                 func.Add(updateResp1);
 
                 resp2 = "Trolls don't just appear. I need to know anything suspicious that happened.";
                 func.Add(updateResp2);
 
                 resp3 = "You're lying. There's no way a troll just snuck past you.";
+                setResp3Icon(-1);
                 func.Add(updateResp3);
                 break;
 
             case 6:
-                if (response == 0 || response == 1) {
+                if (response == 0) {
+                    conversation.setDialogue("I don't know anything I haven't told the other officers, I swear!", false);
+                    manager.addReputation(5);
+                }
+                if (response == 1) {
                     conversation.setDialogue("I don't know anything I haven't told the other officers, I swear!", false);
                 }
                 else if (response == 2) {
                     conversation.setDialogue("No! I'm telling the truth, I swear! Aren't I supposed to be innocent until proven guilty?!", false);
-                    manager.infamy++;
+                    manager.addInfamy(5);
                 }
 
                 resp1 = "I'm going to need access to the security camera footage.";
@@ -134,7 +140,6 @@ public class Scene1 : Cutscene {
                 conversation.hide();
                 bool crooked = response == 0 ? false : true;
                 loadLevel(crooked);
-
                 break;
 
             default:
@@ -143,6 +148,7 @@ public class Scene1 : Cutscene {
     }
 
     private void loadLevel(bool crooked) {
-        StartCoroutine(manager.nextLevel());
+        manager.setCrooked(crooked);
+        manager.next();
     }
 }

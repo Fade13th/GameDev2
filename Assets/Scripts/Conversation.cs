@@ -9,6 +9,8 @@ public class Conversation : MonoBehaviour {
     private UnityEngine.UI.Button response1, response2, response3;
     private Image playerImage, otherImage;
 
+    private Image resp1Icon, resp2Icon, resp3Icon;
+
 	// Use this for initialization
 	void Awake () {
         playerIcon = GameObject.Find("PlayerIcon").GetComponent<CanvasGroup>();
@@ -22,6 +24,10 @@ public class Conversation : MonoBehaviour {
         response1 = GameObject.Find("Response1").GetComponent<UnityEngine.UI.Button>();
         response2 = GameObject.Find("Response2").GetComponent<UnityEngine.UI.Button>();
         response3 = GameObject.Find("Response3").GetComponent<UnityEngine.UI.Button>();
+
+        resp1Icon = GameObject.Find("Response1Icon").GetComponent<Image>();
+        resp2Icon = GameObject.Find("Response2Icon").GetComponent<Image>();
+        resp3Icon = GameObject.Find("Response3Icon").GetComponent<Image>();
 
         playerImage = GameObject.Find("PlayerImage").GetComponent<Image>();
         otherImage = GameObject.Find("OtherImage").GetComponent<Image>();
@@ -103,11 +109,19 @@ public class Conversation : MonoBehaviour {
         response1.GetComponentInChildren<Text>().text = text;
     }
 
+    public void setResponse1Icon(Sprite image) {
+        resp1Icon.sprite = image;
+    }
+
     public void setResponse2(string text) {
         response2.GetComponent<CanvasGroup>().alpha = 1;
         response2.GetComponent<CanvasGroup>().blocksRaycasts = true;
 
         response2.GetComponentInChildren<Text>().text = text;
+    }
+
+    public void setResponse2Icon(Sprite image) {
+        resp2Icon.sprite = image;
     }
 
     public void setResponse3(string text) {
@@ -117,4 +131,7 @@ public class Conversation : MonoBehaviour {
         response3.GetComponentInChildren<Text>().text = text;
     }
 
+    public void setResponse3Icon(Sprite image) {
+        resp3Icon.sprite = image;
+    }
 }

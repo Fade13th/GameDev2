@@ -37,7 +37,7 @@ public class Level : MonoBehaviour {
         return stage;
     }
 
-    protected virtual void updateObj() {
+    public virtual void updateObj() {
         fading = true;
         objectiveText.color = Color.red;
     }
