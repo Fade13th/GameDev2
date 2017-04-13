@@ -21,7 +21,9 @@ public class Cutscene : MonoBehaviour {
     public Sprite[] sprites;
     public Sprite[] responseIcons;
 
-    protected bool crooked;
+    public bool crooked;
+
+    private static Cutscene _scene;
 
     protected void updateResp1() {
         conversation.setResponse1(resp1);
@@ -73,6 +75,8 @@ public class Cutscene : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        _scene = this;
+
         conversation = GameObject.Find("Conversation").GetComponent<Conversation>();
         func = new List<Func>();
 
@@ -117,5 +121,9 @@ public class Cutscene : MonoBehaviour {
         player.setCutsceneDirection(0);
                 
         stepCutscene(0);
+    }
+
+    public static Cutscene getScene() {
+        return _scene;
     }
 }

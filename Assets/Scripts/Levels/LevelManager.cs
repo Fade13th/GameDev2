@@ -110,10 +110,7 @@ public class LevelManager : MonoBehaviour {
         completeGuiOpen = false;
         levelCompleteUI.alpha = 0;
         levelCompleteUI.blocksRaycasts = false;
-
-        print("Level " + currentLevel);
-        print("Scene " + currentScene);
-
+        
         if (currentLevel == levels.Length - 1 && currentScene == cutscenes.Length) {
             gameComplete();
             return;
@@ -169,6 +166,7 @@ public class LevelManager : MonoBehaviour {
         levelUI.alpha = 0;
 
         scene = GameObject.Instantiate(cutscenes[currentScene]);
+        scene.crooked = crooked;
     }
 
     private void OnSceneExit() {
