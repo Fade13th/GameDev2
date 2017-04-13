@@ -12,7 +12,7 @@ public class FoVController : MonoBehaviour {
     private Color _playerVisible, _playerNotVisible;
     private FoVRender _foVRender;
 
-    public float sightBuffer = 0.5f;
+    public float sightBuffer = 1f;
     private float lastSeen;
 
     public List<Vector2> Points {

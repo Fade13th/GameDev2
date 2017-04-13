@@ -151,6 +151,6 @@ public class Scene1 : Cutscene {
 
     private void loadLevel(bool crooked) {
         manager.setCrooked(crooked);
-        manager.next();
+        manager.next(false);
     }
 }

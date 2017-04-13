@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelManager : MonoBehaviour {
@@ -32,6 +33,8 @@ public class LevelManager : MonoBehaviour {
     private bool crooked;
 
     private Text completeRank, completeStrike, completeCamera, completeGuard, completeLaser, completeRep, completeInf;
+
+    private bool completeGuiOpen = false;
 
     void Awake()
     {
@@ -94,15 +97,27 @@ public class LevelManager : MonoBehaviour {
         experience += i;
     }
 
-    public void next() {
+    public void next(bool gui) {
+        if (gui != completeGuiOpen)
+            return;
+
         if (scene != null)
             OnSceneExit();
 
         if (level != null)
             OnLevelExit();
 
+        completeGuiOpen = false;
         levelCompleteUI.alpha = 0;
         levelCompleteUI.blocksRaycasts = false;
+
+        print("Level " + currentLevel);
+        print("Scene " + currentScene);
+
+        if (currentLevel == levels.Length - 1 && currentScene == cutscenes.Length) {
+            gameComplete();
+            return;
+        }
 
         if (currentScene > currentLevel + 1) {
             StartCoroutine(nextLevel());
@@ -135,8 +150,7 @@ public class LevelManager : MonoBehaviour {
         OnLevelStart();
     }
 
-    public IEnumerator resetLevel()
-    {
+    public IEnumerator resetLevel() {
         bFade = true;
         yield return new WaitForSeconds(1.5f);
         targetAlpha = 0;
@@ -171,6 +185,7 @@ public class LevelManager : MonoBehaviour {
     }
 
     private void OnLevelExit() {
+        print("Exit " + currentLevel);
         Destroy(level.gameObject);
         level = null;
     }
@@ -182,16 +197,64 @@ public class LevelManager : MonoBehaviour {
 
     public void laserSpot() {
         laserSpots++;
-        StartCoroutine(resetLevel());
+        if (!checkStrikes())
+            StartCoroutine(resetLevel());
     }
 
     public void guardSpot() {
         guardSpots++;
-        StartCoroutine(resetLevel());
+        if (!checkStrikes())
+            StartCoroutine(resetLevel());
     }
 
     public void cameraSpot() {
         camSpots++;
+        checkStrikes();
+    }
+
+    public bool checkStrikes() {
+        strikes = Config.getConfig().getStrikes(camSpots, guardSpots, laserSpots);
+        return checkFail();
+    }
+
+    private bool checkFail() {
+        if (strikes >= 3) {
+            fail();
+            return true;
+        }
+        return false;
+    }
+
+    private void fail() {
+        levelUI.blocksRaycasts = false;
+        Destroy(PlayerController.GetPlayer());
+
+        GameObject.Find("Failed").GetComponent<CanvasGroup>().alpha = 1;
+        GameObject.Find("Failed").GetComponent<CanvasGroup>().blocksRaycasts = true;
+
+        GameObject.Find("FailStrikes").GetComponent<Text>().text = strikes + "";
+        GameObject.Find("FailCameraSpots").GetComponent<Text>().text = camSpots + "";
+        GameObject.Find("FailGuardSpots").GetComponent<Text>().text = guardSpots + "";
+        GameObject.Find("FailLaserSpots").GetComponent<Text>().text = laserSpots + "";
+    }
+
+    public void restart() {
+        SceneManager.LoadScene(0);
+    }
+
+    private void gameComplete() {
+        levelUI.alpha = 0;
+        levelUI.blocksRaycasts = false;
+        levelCompleteUI.blocksRaycasts = false;
+
+        Destroy(PlayerController.GetPlayer());
+
+        GameObject.Find("Complete").GetComponent<CanvasGroup>().alpha = 1;
+        GameObject.Find("Complete").GetComponent<CanvasGroup>().blocksRaycasts = true;
+
+        GameObject.Find("CompleteRank").GetComponent<Text>().text = Config.getConfig().getRank(experience);
+        GameObject.Find("CompleteReputation").GetComponent<Text>().text = Config.getConfig().getRep(reputation);
+        GameObject.Find("CompleteInfamy").GetComponent<Text>().text = Config.getConfig().getInf(infamy);
     }
 
     public void levelComplete() {
@@ -208,6 +271,14 @@ public class LevelManager : MonoBehaviour {
         levelCompleteUI.alpha = 1;
         levelCompleteUI.blocksRaycasts = true;
         levelCompleteUI.interactable = true;
-        PlayerController.GetPlayer().cutscene = true;
+
+        PlayerController.GetPlayer().GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
+        PlayerController.GetPlayer().GetComponent<Collider2D>().enabled = false;
+        foreach (Collider2D coll in PlayerController.GetPlayer().GetComponentsInChildren<Collider2D>()) {
+            coll.enabled = false;
+        }
+        PlayerController.GetPlayer().enabled = false;
+
+        completeGuiOpen = true;
     }
 }
