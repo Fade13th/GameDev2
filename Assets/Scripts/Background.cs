@@ -18,14 +18,19 @@ public class Background : MonoBehaviour {
     }
 
     void Update() {
-        float xOffset = Mathf.Repeat(player.transform.position.x * 0.1f, 2* tileSizeX);
+        if (player != null)
+        {
+            float xOffset = Mathf.Repeat(player.transform.position.x * 0.1f, 2 * tileSizeX);
 
-        float yOffset = startPosition.y;
+            float yOffset = startPosition.y;
 
-        if (player.transform.position.y > 0) {
-            yOffset = (player.transform.position.y) * 0.9f + startPosition.y;
+            if (player.transform.position.y > 0)
+            {
+                yOffset = (player.transform.position.y) * 0.9f + startPosition.y;
+            }
+
+            transform.position = player.transform.position + Vector3.left * (xOffset - tileSizeX) +
+                                 Vector3.up * (yOffset - player.transform.position.y);
         }
-
-        transform.position = player.transform.position + Vector3.left * (xOffset - tileSizeX) + Vector3.up * (yOffset - player.transform.position.y);
     }
 }

@@ -9,6 +9,7 @@ public class LevelManager : MonoBehaviour {
     public static LevelManager levelManager;
     public Level[] levels;
     public Cutscene[] cutscenes;
+    public Cutscene bossCutscene;
 
     int currentScene = 0, currentLevel =-1;
 
@@ -29,6 +30,8 @@ public class LevelManager : MonoBehaviour {
     private int camSpots = 0;
     private int guardSpots = 0;
     private int laserSpots = 0;
+
+    private bool inBossScene;
 
     private bool crooked;
 
@@ -59,6 +62,8 @@ public class LevelManager : MonoBehaviour {
         completeLaser = GameObject.Find("LaserSpots").GetComponent<Text>();
         completeRep = GameObject.Find("Reputation").GetComponent<Text>();
         completeInf = GameObject.Find("Infamy").GetComponent<Text>();
+
+        inBossScene = false;
 
         if (cutscenes.Length != 0)
             StartCoroutine(nextScene());
@@ -211,12 +216,33 @@ public class LevelManager : MonoBehaviour {
     }
 
     public bool checkStrikes() {
+        int oldStrikes = strikes;
         strikes = Config.getConfig().getStrikes(camSpots, guardSpots, laserSpots);
-        return checkFail();
+        if(checkFail()) {
+            return true;
+        }
+        else if(strikes > oldStrikes) {
+            StartCoroutine(runBossCutscene());
+            return true;
+        }
+        return false;
+    }
+
+    private IEnumerator runBossCutscene() {
+        bFade = true;
+
+        yield return new WaitForSeconds(1.5f);
+        OnLevelExit();
+        currentLevel--;
+        targetAlpha = 0;
+        levelUI.alpha = 0;
+
+        scene = GameObject.Instantiate(bossCutscene);
+        scene.crooked = crooked;
     }
 
     private bool checkFail() {
-        if (strikes >= 3) {
+        if(strikes >= 3) {
             fail();
             return true;
         }
@@ -272,7 +298,7 @@ public class LevelManager : MonoBehaviour {
 
         PlayerController.GetPlayer().GetComponent<Rigidbody2D>().constraints = RigidbodyConstraints2D.FreezeAll;
         PlayerController.GetPlayer().GetComponent<Collider2D>().enabled = false;
-        foreach (Collider2D coll in PlayerController.GetPlayer().GetComponentsInChildren<Collider2D>()) {
+        foreach(Collider2D coll in PlayerController.GetPlayer().GetComponentsInChildren<Collider2D>()) {
             coll.enabled = false;
         }
         PlayerController.GetPlayer().enabled = false;
