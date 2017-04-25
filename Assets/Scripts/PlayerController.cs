@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour {
 
     public Animator anim;
 
-    public bool falling = false;
+    public float falling = 0;
 
     //Grounded Vars
     public bool isGrounded = true;
@@ -44,16 +44,21 @@ public class PlayerController : MonoBehaviour {
                 GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, jump);
                 isGrounded = false;
                 JumpButtonPressed = false;
-                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), true);
             }
 
 
-            if (Input.GetKey(KeyCode.S)) {
-                falling = true;
+            if (Input.GetKeyDown(KeyCode.S)) {
+                falling = Time.time;
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), true);
+            } else if (GetComponent<Rigidbody2D>().velocity.y > 0)
+            {
+                Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), true);
+            }else if (Input.GetKey(KeyCode.S) || falling + 0.3 > Time.time)
+            {
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), true);
             }
-            else if (Input.GetKeyUp(KeyCode.S) || GetComponent<Rigidbody2D>().velocity.y < 0) {
-                falling = false;
+            else
+            {
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), false);
             }
 
@@ -92,7 +97,6 @@ public class PlayerController : MonoBehaviour {
     //Check if Grounded
     void OnTriggerEnter2D(Collider2D collider) {
         if ((collider.tag == "Floor" || collider.tag == "Platform") && collider.transform.position.y < transform.position.y) {
-            falling = false;
             isGrounded = true;
         }
     }
