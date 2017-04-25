@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,7 +10,16 @@ public class Objective : Interactable {
     public Level level;
 
     protected override void use() {
-        if (stage == level.getStage())
-            level.progress();
+        if (level != null)
+            if (stage == level.getStage())
+                level.progress();
+    }
+
+
+    protected override String GetPrompt() {
+        if (level != null)
+            if (level.getStage() == stage)
+                return "Press \"E\" to Use";
+        return null;
     }
 }

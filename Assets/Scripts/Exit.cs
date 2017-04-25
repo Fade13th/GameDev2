@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,5 +12,13 @@ public class Exit : Interactable {
         if (level.getStage() == stage) {
             level.progress();
         }
+    }
+
+    protected override String GetPrompt() {
+        if (level.getStage() == stage)
+        {
+            return "Press \"E\" to Leave";
+        }
+        return null;
     }
 }
