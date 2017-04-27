@@ -91,7 +91,7 @@ public class FoVController : MonoBehaviour {
     }
 
     void OnTriggerStay2D(Collider2D collider) {
-        if (PlayerSeen || lastSeen > Time.time) return;
+        if (PlayerSeen) return;
 
         if (collider.tag == "PlayerFoVDetection") {
             Vector3 origin = transform.parent.position;
@@ -102,6 +102,7 @@ public class FoVController : MonoBehaviour {
                 PlayerSeen = true;
                 Debug.DrawLine(origin, raycast.point, Color.magenta);
 
+                if (lastSeen > Time.time) return;
                 if (GetComponentInParent<CCTVCamera>() != null) {
                     LevelManager.GetLevelManager().cameraSpot();
                 }
@@ -121,7 +122,7 @@ public class FoVController : MonoBehaviour {
     }
 
     void OnTriggerExit2D(Collider2D collider) {
-        if (collider.tag == "PlayerFoVDetection") {
+        if (collider.tag == "PlayerFoVDetection" && PlayerSeen) {
             PlayerSeen = false;
             lastSeen = Time.time + sightBuffer;
         }
