@@ -15,6 +15,8 @@ public class BossScene1 : Cutscene {
         switch (stage) {
             case 0:
                 conversation.setPlayerImage(sprites[0]);
+                conversation.hideOther();
+
                 conversation.show();
                 conversation.setDialogue("If I keep getting caught where I'm not supposed to be, eventually my boss will notice and, I might be kicked off the case.",
                     true);

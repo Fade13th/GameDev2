@@ -15,6 +15,8 @@ public class GuardSpot : Cutscene{
             case 0:
                 conversation.setPlayerImage(sprites[0]);
                 conversation.setOtherImage(sprites[2]);
+                conversation.setOtherName("Guard");
+
                 conversation.show();
                 conversation.setDialogue("Hey, what are you doing here?", false);
                 resp1 = "Run";

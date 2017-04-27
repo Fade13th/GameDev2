@@ -14,6 +14,8 @@ public class LaserSpot : Cutscene {
         switch (stage) {
             case 0:
                 conversation.setPlayerImage(sprites[0]);
+                conversation.hideOther();
+
                 conversation.show();
                 conversation.setDialogue("Alarms start Wailing", true);
                 resp1 = "Run";
