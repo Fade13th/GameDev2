@@ -4,8 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class BossScene1 : Cutscene {
-    
+public class GuardSpot : Cutscene{
     public override void stepCutscene(int response) {
         base.stepCutscene(response);
 
@@ -15,30 +14,16 @@ public class BossScene1 : Cutscene {
         switch (stage) {
             case 0:
                 conversation.setPlayerImage(sprites[0]);
+                conversation.setOtherImage(sprites[2]);
                 conversation.show();
-                conversation.setDialogue("If I keep getting caught where I'm not supposed to be, eventually my boss will notice and, I might be kicked off the case.",
-                    true);
-                resp1 = "Then I should keep to the shadows, where no one will ever see me";
+                conversation.setDialogue("Hey, what are you doing here?", false);
+                resp1 = "Run";
                 func.Add(updateResp1);
-
-                resp2 = "Then I had best makesure now one speaks up about my activities.";
+                resp2 = "Look, a plane!";
                 func.Add(updateResp2);
-                setResp2Icon(-1);
                 break;
 
             case 1:
-                if (response == 0) {
-                }
-                else if (response == 1) {
-                    manager.addInfamy(3);
-                    crooked = true;
-                }
-
-                conversation.hide();
-                walk(1, 1.1f);
-                break;
-
-            case 2:
                 loadLevel(crooked);
                 break;
 
@@ -48,7 +33,7 @@ public class BossScene1 : Cutscene {
     }
 
     private void loadLevel(bool crooked) {
-        manager.setCrooked(crooked);
-        manager.next(false);
+        manager.resetLevelFromConv();
+        Destroy(gameObject);
     }
 }

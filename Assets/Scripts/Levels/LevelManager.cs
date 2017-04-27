@@ -10,6 +10,8 @@ public class LevelManager : MonoBehaviour {
     public Level[] levels;
     public Cutscene[] cutscenes;
     public Cutscene[] bossCutscenes;
+    public Cutscene guardSpotted;
+    public Cutscene laserSpotted;
 
     int currentScene = 0, currentLevel =-1;
 
@@ -152,14 +154,22 @@ public class LevelManager : MonoBehaviour {
         OnLevelStart();
     }
 
+    public void resetLevelFromConv()
+    {
+        StartCoroutine(resetLevel());
+    }
+
     public IEnumerator resetLevel() {
-        bFade = true;
-        yield return new WaitForSeconds(1.5f);
-        targetAlpha = 0;
+        if (!checkStrikes())
+        {
+            bFade = true;
+            yield return new WaitForSeconds(1.5f);
+            targetAlpha = 0;
 
-        OnLevelExit();
+            OnLevelExit();
 
-        OnLevelStart();
+            OnLevelStart();
+        }
     }
 
     private IEnumerator waitToFade(float time) {
@@ -199,20 +209,25 @@ public class LevelManager : MonoBehaviour {
     }
 
     public void laserSpot() {
-        laserSpots++;
-        if (!checkStrikes())
-            StartCoroutine(resetLevel());
+        if (!PlayerController.GetPlayer().cutscene)
+        {
+            laserSpots++;
+            PlayerController.GetPlayer().cutscene = true;
+            Cutscene conv = Instantiate(laserSpotted);
+        }
     }
 
     public void guardSpot() {
-        guardSpots++;
-        if (!checkStrikes())
-            StartCoroutine(resetLevel());
+        if (!PlayerController.GetPlayer().cutscene)
+        {
+            guardSpots++;
+            PlayerController.GetPlayer().cutscene = true;
+            Instantiate(guardSpotted);
+        }
     }
 
     public void cameraSpot() {
         camSpots++;
-        checkStrikes();
     }
 
     public bool checkStrikes() {

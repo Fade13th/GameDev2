@@ -94,6 +94,7 @@ public class BossScene2 : Cutscene {
     }
 
     private void loadLevel(bool crooked) {
-        manager.next(crooked);
+        manager.setCrooked(crooked);
+        manager.next(false);
     }
 }

@@ -107,6 +107,7 @@ public class FoVController : MonoBehaviour {
                 }
                 else if (GetComponentInParent<Enemy>() != null) {
                     LevelManager.GetLevelManager().guardSpot();
+                    GetComponentInParent<Enemy>().walkChance = 0;
                 }
                 else if (GetComponentInParent<Toggle>() != null) {
                     LevelManager.GetLevelManager().laserSpot();

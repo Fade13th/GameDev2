@@ -31,7 +31,6 @@ public class PlayerController : MonoBehaviour {
     }
 
     void Update() {
-        if (!cutscene) {
             //Jumping
             if (Input.GetKeyDown(KeyCode.Space) || Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.Z) || Input.GetKeyDown(KeyCode.W)) {
                 JumpButtonPressed = true;
@@ -40,20 +39,20 @@ public class PlayerController : MonoBehaviour {
                 JumpButtonPressed = false;
             }
 
-            if (JumpButtonPressed && isGrounded) {
+            if (JumpButtonPressed && isGrounded  && !cutscene) {
                 GetComponent<Rigidbody2D>().velocity = new Vector2(GetComponent<Rigidbody2D>().velocity.x, jump);
                 isGrounded = false;
                 JumpButtonPressed = false;
             }
 
 
-            if (Input.GetKeyDown(KeyCode.S)) {
+            if (Input.GetKeyDown(KeyCode.S) && !cutscene) {
                 falling = Time.time;
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), true);
-            } else if (GetComponent<Rigidbody2D>().velocity.y > 0)
+            } else if (GetComponent<Rigidbody2D>().velocity.y > 0 )
             {
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), true);
-            }else if (Input.GetKey(KeyCode.S) || falling + 0.3 > Time.time)
+            }else if ((Input.GetKey(KeyCode.S) && !cutscene) || falling + 0.3 > Time.time)
             {
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), true);
             }
@@ -62,7 +61,9 @@ public class PlayerController : MonoBehaviour {
                 Physics2D.IgnoreLayerCollision(LayerMask.NameToLayer("Player"), LayerMask.NameToLayer("Platforms"), false);
             }
 
+        if (!cutscene) {
             moveVelocity = 0;
+
 
             //Left Right Movement
             if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A)) {
