@@ -72,15 +72,21 @@ public class FoVRender : MonoBehaviour {
         }
 
 
-        if (ForceUpdate)
+        if (player != null)
         {
-            CalculateMesh();
-            ForceUpdate = false;
-        }else if (NeedToUpdate)
-        {
-            if (renderer.isVisible || (player.transform.position - transform.parent.position).sqrMagnitude < foVController.Size.sqrMagnitude * 1.5)
-            CalculateMesh();
-            NeedToUpdate = false;
+            if (ForceUpdate)
+            {
+                CalculateMesh();
+                ForceUpdate = false;
+            }
+            else if (NeedToUpdate)
+            {
+                if (renderer.isVisible ||
+                    (player.transform.position - transform.parent.position).sqrMagnitude <
+                    foVController.Size.sqrMagnitude * 1.5)
+                    CalculateMesh();
+                NeedToUpdate = false;
+            }
         }
     }
 
