@@ -9,7 +9,7 @@ public class LevelManager : MonoBehaviour {
     public static LevelManager levelManager;
     public Level[] levels;
     public Cutscene[] cutscenes;
-    public Cutscene bossCutscene;
+    public Cutscene[] bossCutscenes;
 
     int currentScene = 0, currentLevel =-1;
 
@@ -237,7 +237,7 @@ public class LevelManager : MonoBehaviour {
         targetAlpha = 0;
         levelUI.alpha = 0;
 
-        scene = GameObject.Instantiate(bossCutscene);
+        scene = GameObject.Instantiate(bossCutscenes[strikes-1]);
         scene.crooked = crooked;
     }
 
