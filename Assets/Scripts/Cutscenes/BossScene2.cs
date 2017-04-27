@@ -15,7 +15,7 @@ public class BossScene2 : Cutscene {
         switch (stage) {
             case 0:
                 conversation.hide();
-                walk(1, 1.1f);
+                walk(-1, 1.1f);
                 break;
             case 1:
                 conversation.setPlayerImage(sprites[0]);
